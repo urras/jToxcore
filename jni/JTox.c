@@ -444,8 +444,8 @@ JNIEXPORT jobject JNICALL Java_im_tox_jtoxcore_JTox_tox_1get_1user_1status(JNIEn
             break;
     }
 
-    us_enum = (*env)->FindClass(env, "Lim/tox/jtoxcore/ToxUserStatus");
-    fieldID = (*env)->GetStaticFieldID(env, us_enum, status, "Lim/tox/jtoxcore/ToxUserStatus");
+    us_enum = (*env)->FindClass(env, "im/tox/jtoxcore/ToxUserStatus");
+    fieldID = (*env)->GetStaticFieldID(env, us_enum, status, "Lim/tox/jtoxcore/ToxUserStatus;");
 
     UNUSED(obj);
     return (*env)->GetStaticObjectField(env, us_enum, fieldID);
@@ -477,8 +477,8 @@ JNIEXPORT jobject JNICALL Java_im_tox_jtoxcore_JTox_tox_1get_1self_1user_1status
             break;
     }
 
-    us_enum = (*env)->FindClass(env, "Lim/tox/jtoxcore/ToxUserStatus");
-    fieldID = (*env)->GetStaticFieldID(env, us_enum, status, "Lim/tox/jtoxcore/ToxUserStatus");
+    us_enum = (*env)->FindClass(env, "im/tox/jtoxcore/ToxUserStatus");
+    fieldID = (*env)->GetStaticFieldID(env, us_enum, status, "Lim/tox/jtoxcore/ToxUserStatus;");
 
     UNUSED(obj);
     return (*env)->GetStaticObjectField(env, us_enum, fieldID);
@@ -647,7 +647,7 @@ static void callback_userstatus(Tox *tox, int friendnumber, TOX_USERSTATUS statu
                                       "(ILim/tox/jtoxcore/ToxUserStatus;)V");
     jtoxclass = (*env)->GetObjectClass(env, ptr->jtox);
     jtoxmeth = (*env)->GetMethodID(env, jtoxclass, "onUserStatus", "(ILim/tox/jtoxcore/ToxUserStatus;)V");
-    us_enum = (*env)->FindClass(env, "Lim/tox/jtoxcore/ToxUserStatus;");
+    us_enum = (*env)->FindClass(env, "im/tox/jtoxcore/ToxUserStatus");
 
     switch (status) {
         case TOX_USERSTATUS_NONE:
