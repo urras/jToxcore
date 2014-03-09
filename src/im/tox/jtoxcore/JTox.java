@@ -401,7 +401,7 @@ public class JTox<F extends ToxFriend> {
 
 		if (errcode >= 0) {
 			F f = this.friendList.addFriend(errcode);
-            f.setId(address);
+        	f.setId(address);
 			return f;
 		}
 		throw new ToxException(errcode);
@@ -449,7 +449,7 @@ public class JTox<F extends ToxFriend> {
 
 		if (errcode >= 0) {
 			F friend = this.friendList.addFriend(errcode);
-            friend.setId(address);
+        	friend.setId(address);
 			return friend;
 		}
 		throw new ToxException(errcode);
