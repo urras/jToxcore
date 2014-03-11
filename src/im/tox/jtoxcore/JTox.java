@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
+import java.nio.charset.Charset;
 
 /**
  * This is the main wrapper class for the tox library. It contains wrapper
@@ -1253,11 +1254,7 @@ public class JTox<F extends ToxFriend> {
 	 * @return a byte array
 	 */
 	public static byte[] getStringBytes(String in) {
-		try {
-			return in.getBytes("UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw new InternalError("UTF-8 support is needed to continue.");
-		}
+        return (in + '\000').getBytes(Charset.forName("UTF-8"));
 	}
 
 	/**
