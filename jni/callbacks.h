@@ -27,10 +27,10 @@ typedef struct {
 
 static void callback_friendrequest(Tox *, uint8_t *, uint8_t *, uint16_t, void *);
 static void callback_friendmessage(Tox *, int, uint8_t *, uint16_t, void *);
-static void callback_action(Tox *, int, uint8_t *, uint16_t, void *);
-static void callback_namechange(Tox *, int, uint8_t *, uint16_t, void *);
-static void callback_statusmessage(Tox *, int, uint8_t *, uint16_t, void *);
-static void callback_userstatus(Tox *, int, TOX_USERSTATUS, void *);
-static void callback_read_receipt(Tox *, int, uint32_t, void *);
-static void callback_connectionstatus(Tox *, int, uint8_t, void *);
+static void callback_action(Tox *, int32_t, uint8_t *, uint16_t, void *);
+static void callback_namechange(Tox *, int32_t, uint8_t *, uint16_t, void *);
+static void callback_statusmessage(Tox *, int32_t, uint8_t *, uint16_t, void *);
+static void callback_userstatus(Tox *, int32_t, uint8_t, void *);
+static void callback_read_receipt(Tox *, int32_t, uint32_t, void *);
+static void callback_connectionstatus(Tox *, int32_t, uint8_t, void *);
 

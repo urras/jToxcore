@@ -298,8 +298,7 @@ JNIEXPORT jstring JNICALL Java_im_tox_jtoxcore_JTox_tox_1get_1self_1name(JNIEnv 
 {
     jstring _name;
     uint8_t *name = malloc(TOX_MAX_NAME_LENGTH);
-    uint16_t length = tox_get_self_name(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, name,
-                                        TOX_MAX_NAME_LENGTH);
+    uint16_t length = tox_get_self_name(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, name);
 
     if (length == 0) {
         free(name);
@@ -556,7 +555,7 @@ static void callback_friendmessage(Tox *tox, int friendnumber, uint8_t *message,
     UNUSED(tox);
 }
 
-static void callback_action(Tox *tox, int friendnumber, uint8_t *action, uint16_t length, void *rptr)
+static void callback_action(Tox *tox, int32_t friendnumber, uint8_t *action, uint16_t length, void *rptr)
 {
     tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
     JNIEnv *env;
@@ -575,7 +574,7 @@ static void callback_action(Tox *tox, int friendnumber, uint8_t *action, uint16_
     UNUSED(tox);
 }
 
-static void callback_namechange(Tox *tox, int friendnumber, uint8_t *newname, uint16_t length, void *rptr)
+static void callback_namechange(Tox *tox, int32_t friendnumber, uint8_t *newname, uint16_t length, void *rptr)
 {
     tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
     JNIEnv *env;
@@ -601,7 +600,7 @@ static void callback_namechange(Tox *tox, int friendnumber, uint8_t *newname, ui
     UNUSED(tox);
 }
 
-static void callback_statusmessage(Tox *tox, int friendnumber, uint8_t *newstatus, uint16_t length, void *rptr)
+static void callback_statusmessage(Tox *tox, int32_t friendnumber, uint8_t *newstatus, uint16_t length, void *rptr)
 {
     tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
     JNIEnv *env;
@@ -626,7 +625,7 @@ static void callback_statusmessage(Tox *tox, int friendnumber, uint8_t *newstatu
     UNUSED(tox);
 }
 
-static void callback_userstatus(Tox *tox, int friendnumber, TOX_USERSTATUS status, void *rptr)
+static void callback_userstatus(Tox *tox, int32_t friendnumber, uint8_t status, void *rptr)
 {
     tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
     JNIEnv *env;
@@ -676,7 +675,7 @@ static void callback_userstatus(Tox *tox, int friendnumber, TOX_USERSTATUS statu
     UNUSED(tox);
 }
 
-static void callback_read_receipt(Tox *tox, int friendnumber, uint32_t receipt, void *rptr)
+static void callback_read_receipt(Tox *tox, int32_t friendnumber, uint32_t receipt, void *rptr)
 {
     tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
     JNIEnv *env;
@@ -691,7 +690,7 @@ static void callback_read_receipt(Tox *tox, int friendnumber, uint32_t receipt, 
     UNUSED(tox);
 }
 
-static void callback_connectionstatus(Tox *tox, int friendnumber, uint8_t newstatus, void *rptr)
+static void callback_connectionstatus(Tox *tox, int32_t friendnumber, uint8_t newstatus, void *rptr)
 {
     tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
     JNIEnv *env;
