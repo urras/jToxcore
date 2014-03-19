@@ -514,7 +514,7 @@ JNIEXPORT jintArray JNICALL Java_im_tox_jtoxcore_JTox_tox_1get_1friendlist(JNIEn
  * Begin Callback Section
  */
 
-static void callback_friendrequest(uint8_t *pubkey, uint8_t *message, uint16_t length, void *rptr)
+static void callback_friendrequest(Tox *tox, uint8_t *pubkey, uint8_t *message, uint16_t length, void *rptr)
 {
     tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
     JNIEnv *env;
@@ -534,6 +534,7 @@ static void callback_friendrequest(uint8_t *pubkey, uint8_t *message, uint16_t l
     (*env)->SetByteArrayRegion(env, _message, 0, length - 1, (jbyte *) message);
 
     (*env)->CallVoidMethod(env, ptr->handler, meth, _pubkey, _message);
+    UNUSED(tox);
 }
 
 static void callback_friendmessage(Tox *tox, int friendnumber, uint8_t *message, uint16_t length, void *rptr)

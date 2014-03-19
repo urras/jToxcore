@@ -25,7 +25,7 @@ typedef struct {
     jobject jtox;
 } tox_jni_globals_t;
 
-static void callback_friendrequest(uint8_t *, uint8_t *, uint16_t, void *);
+static void callback_friendrequest(Tox *, uint8_t *, uint8_t *, uint16_t, void *);
 static void callback_friendmessage(Tox *, int, uint8_t *, uint16_t, void *);
 static void callback_action(Tox *, int, uint8_t *, uint16_t, void *);
 static void callback_namechange(Tox *, int, uint8_t *, uint16_t, void *);
