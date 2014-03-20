@@ -113,9 +113,12 @@ public class JTox<F extends ToxFriend> {
 		this.lock = new ReentrantLock();
 		validPointers.add(pointer);
 		instanceLock.lock();
-		this.instanceNumber = instanceCounter++;
-		instances.put(instanceCounter, this);
-		instanceLock.unlock();
+		try {
+			this.instanceNumber = instanceCounter++;
+			instances.put(instanceCounter, this);
+		} finally {
+			instanceLock.unlock();
+		}
 	}
 
 	/**
@@ -225,11 +228,12 @@ public class JTox<F extends ToxFriend> {
 	 */
 	public void setStatusMessage(String message) throws ToxException {
 		this.lock.lock();
-		byte[] messageArray = getStringBytes(message);
-		if (messageArray.length >= TOX_MAX_STATUSMESSAGE_LENGTH) {
-			throw new ToxException(ToxError.TOX_TOOLONG);
-		}
 		try {
+			byte[] messageArray = getStringBytes(message);
+			if (messageArray.length >= TOX_MAX_STATUSMESSAGE_LENGTH) {
+				throw new ToxException(ToxError.TOX_TOOLONG);
+			}
+
 			checkPointer();
 
 			if (tox_set_status_message(this.messengerPointer, messageArray,
@@ -302,11 +306,12 @@ public class JTox<F extends ToxFriend> {
 	 */
 	public void setName(String newname) throws ToxException {
 		this.lock.lock();
-		byte[] newnameArray = getStringBytes(newname);
-		if (newnameArray.length >= TOX_MAX_NICKNAME_LENGTH) {
-			throw new ToxException(ToxError.TOX_TOOLONG);
-		}
 		try {
+			byte[] newnameArray = getStringBytes(newname);
+			if (newnameArray.length >= TOX_MAX_NICKNAME_LENGTH) {
+				throw new ToxException(ToxError.TOX_TOOLONG);
+			}
+
 			checkPointer();
 
 			if (tox_set_name(this.messengerPointer, newnameArray,
@@ -520,20 +525,19 @@ public class JTox<F extends ToxFriend> {
 	 *             if the instance has been killed or the message was not sent
 	 */
 	public int sendMessage(F friend, String message) throws ToxException {
-		this.lock.lock();
 		byte[] messageArray = getStringBytes(message);
+		this.lock.lock();
 		int result;
 		try {
 			checkPointer();
 
 			result = tox_send_message(this.messengerPointer,
 					friend.getFriendnumber(), messageArray, messageArray.length);
+			if (result == 0) {
+				throw new ToxException(ToxError.TOX_SEND_FAILED);
+			}
 		} finally {
 			this.lock.unlock();
-		}
-
-		if (result == 0) {
-			throw new ToxException(ToxError.TOX_SEND_FAILED);
 		}
 		return result;
 	}
@@ -620,8 +624,8 @@ public class JTox<F extends ToxFriend> {
 	 *             if the instance has been killed or the send failed
 	 */
 	public void sendAction(F friend, String action) throws ToxException {
-		this.lock.lock();
 		byte[] actionArray = getStringBytes(action);
+		this.lock.lock();
 		try {
 			checkPointer();
 
