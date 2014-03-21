@@ -24,9 +24,9 @@ package im.tox.jtoxcore;
 /**
  * Exception class used in the Tox project. Carries an Errorcode that signals
  * the error that occurred during the execution of native code
- * 
+ *
  * @author sonOfRa
- * 
+ *
  */
 public class ToxException extends Exception {
 	private static final long serialVersionUID = 1L;
@@ -35,7 +35,7 @@ public class ToxException extends Exception {
 
 	/**
 	 * Create a new ToxException with the given error code
-	 * 
+	 *
 	 * @param error
 	 *            the error code to create the new Exception with
 	 */
@@ -46,37 +46,45 @@ public class ToxException extends Exception {
 
 	/**
 	 * Create a new ToxException with an error code as int
-	 * 
+	 *
 	 * @param errcode
 	 *            the error code, as an integer
 	 */
 	public ToxException(int errcode) {
 		super();
+
 		switch (errcode) {
-		case -1:
-			this.error = ToxError.TOX_TOOLONG;
-			break;
-		case -2:
-			this.error = ToxError.TOX_FAERR_NOMESSAGE;
-			break;
-		case -3:
-			this.error = ToxError.TOX_FAERR_OWNKEY;
-			break;
-		case -4:
-			this.error = ToxError.TOX_FAERR_ALREADYSENT;
-			break;
-		case -6:
-			this.error = ToxError.TOX_FAERR_BADCHECKSUM;
-			break;
-		case -7:
-			this.error = ToxError.TOX_FAERR_SETNEWNOSPAM;
-			break;
-		case -8:
-			this.error = ToxError.TOX_FAERR_NOMEM;
-			break;
-		default:
-			this.error = ToxError.TOX_UNKNOWN;
-			break;
+			case -1 :
+				this.error = ToxError.TOX_TOOLONG;
+				break;
+
+			case -2 :
+				this.error = ToxError.TOX_FAERR_NOMESSAGE;
+				break;
+
+			case -3 :
+				this.error = ToxError.TOX_FAERR_OWNKEY;
+				break;
+
+			case -4 :
+				this.error = ToxError.TOX_FAERR_ALREADYSENT;
+				break;
+
+			case -6 :
+				this.error = ToxError.TOX_FAERR_BADCHECKSUM;
+				break;
+
+			case -7 :
+				this.error = ToxError.TOX_FAERR_SETNEWNOSPAM;
+				break;
+
+			case -8 :
+				this.error = ToxError.TOX_FAERR_NOMEM;
+				break;
+
+			default :
+				this.error = ToxError.TOX_UNKNOWN;
+				break;
 		}
 	}
 

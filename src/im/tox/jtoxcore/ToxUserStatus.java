@@ -1,5 +1,5 @@
 /* ToxUserStatus.java
- * 
+ *
  *  Copyright (C) 2013 Tox project All Rights Reserved.
  *
  *  This file is part of jToxcore
@@ -23,9 +23,9 @@ package im.tox.jtoxcore;
 
 /**
  * Enum for wrapping userstatus
- * 
+ *
  * @author sonOfra
- * 
+ *
  */
 public enum ToxUserStatus {
 	/**

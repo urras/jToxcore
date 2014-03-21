@@ -24,7 +24,7 @@ import im.tox.jtoxcore.ToxFriend;
 
 /**
  * Callback class for receiving name changes
- * 
+ *
  * @author sonOfRa
  * @param <F>
  *            Friend type to use with the OnNameChangeCallback instance
@@ -33,7 +33,7 @@ public interface OnNameChangeCallback<F extends ToxFriend> {
 
 	/**
 	 * Method to be executed each time a name change is received from a friend
-	 * 
+	 *
 	 * @param friend
 	 *            the friend
 	 * @param newname

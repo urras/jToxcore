@@ -24,17 +24,17 @@ import im.tox.jtoxcore.ToxFriend;
 
 /**
  * Callback class for receiving connection status changes from friends
- * 
+ *
  * @author sonOfRa
  * @param <F>
  *            Friend type to use with the OnConnectionStatusCallback instance
- * 
+ *
  */
 public interface OnConnectionStatusCallback<F extends ToxFriend> {
 
 	/**
 	 * Method to be executed each time a connection status is received
-	 * 
+	 *
 	 * @param friend
 	 *            the friend who's status changed
 	 * @param online

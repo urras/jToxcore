@@ -23,7 +23,7 @@ package im.tox.jtoxcore;
 /**
  * Exception to be thrown if a friend is added to a Friendlist even though a
  * friend with that number already exists.
- * 
+ *
  * @author sonOfRa
  */
 public class FriendExistsException extends Exception {
@@ -33,7 +33,7 @@ public class FriendExistsException extends Exception {
 	/**
 	 * Create a new FriendExistsException with the specified friendnumber and no
 	 * message
-	 * 
+	 *
 	 * @param friendnumber
 	 *            the friendnumber
 	 */
@@ -45,7 +45,7 @@ public class FriendExistsException extends Exception {
 	/**
 	 * Create a new FriendExistsException with the specified friendnumber and
 	 * detail message
-	 * 
+	 *
 	 * @param friendnumber
 	 *            the friendnumber
 	 * @param message

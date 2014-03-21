@@ -24,17 +24,17 @@ import im.tox.jtoxcore.ToxFriend;
 
 /**
  * Callback class for receiving actions from friends
- * 
+ *
  * @author sonOfRa
  * @param <F>
  *            Friend type to use with the OnActionCallback instance
- * 
+ *
  */
 public interface OnActionCallback<F extends ToxFriend> {
 
 	/**
 	 * Method to be executed each time an action is received
-	 * 
+	 *
 	 * @param friend
 	 *            the friend who sent the action
 	 * @param action

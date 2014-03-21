@@ -1,5 +1,5 @@
 /* FriendList.java
- * 
+ *
  *  Copyright (C) 2013 Tox project All Rights Reserved.
  *
  *  This file is part of jToxcore
@@ -24,17 +24,17 @@ import java.util.List;
 
 /**
  * Interface definition for a Tox Friendlist implementation
- * 
+ *
  * @author sonOfRa
  * @param <F>
  *            Friend type to use with the FriendList instance
- * 
+ *
  */
 public interface FriendList<F extends ToxFriend> {
 
 	/**
 	 * Retrieve a friend from the list by its number
-	 * 
+	 *
 	 * @param friendnumber
 	 *            the number to look for
 	 * @return the first friend in the list with the specified friendnumber.
@@ -44,7 +44,7 @@ public interface FriendList<F extends ToxFriend> {
 
 	/**
 	 * Retrieve a friend by its client id.
-	 * 
+	 *
 	 * @param id
 	 *            the id to search for
 	 * @return the first friend in the list with the specified client id. Null
@@ -54,7 +54,7 @@ public interface FriendList<F extends ToxFriend> {
 
 	/**
 	 * Retrieve all friends with the specified name
-	 * 
+	 *
 	 * @param name
 	 *            the name to look for
 	 * @param ignorecase
@@ -68,7 +68,7 @@ public interface FriendList<F extends ToxFriend> {
 	/**
 	 * Retrieve all Friends that have the content of partial inside of their
 	 * names. This method should ignore the case when comparing.
-	 * 
+	 *
 	 * @param partial
 	 *            the partial String to look for
 	 * @return a List containing all friends that match the partial String. If
@@ -78,7 +78,7 @@ public interface FriendList<F extends ToxFriend> {
 
 	/**
 	 * Get all friends that are currently online and have the specified status.
-	 * 
+	 *
 	 * @param status
 	 *            the status to search for
 	 * @return a List containing all friends with the specified status. If no
@@ -88,7 +88,7 @@ public interface FriendList<F extends ToxFriend> {
 
 	/**
 	 * Get all currently online friends
-	 * 
+	 *
 	 * @return a List containing all online friends. If no friends are online,
 	 *         an empty List is returned.
 	 */
@@ -96,7 +96,7 @@ public interface FriendList<F extends ToxFriend> {
 
 	/**
 	 * Get all currently offline friends
-	 * 
+	 *
 	 * @return a List containing all offline friends. If no friends are offline,
 	 *         an empty List is returned.
 	 */
@@ -104,7 +104,7 @@ public interface FriendList<F extends ToxFriend> {
 
 	/**
 	 * Get all friends
-	 * 
+	 *
 	 * @return a List containing all friends. If there are no friends, an empty
 	 *         List is returned.
 	 */
@@ -112,7 +112,7 @@ public interface FriendList<F extends ToxFriend> {
 
 	/**
 	 * Create the new friend and add it to the list
-	 * 
+	 *
 	 * @param friendnumber
 	 *            the new friend
 	 * @return the newly created friend
@@ -123,7 +123,7 @@ public interface FriendList<F extends ToxFriend> {
 
 	/**
 	 * Create the new friend and add it to the list
-	 * 
+	 *
 	 * @param friendnumber
 	 *            the new friend
 	 * @return the newly created friend, or the friend with the specified friend
@@ -133,7 +133,7 @@ public interface FriendList<F extends ToxFriend> {
 
 	/**
 	 * Remove the friend associated with that friendnumber
-	 * 
+	 *
 	 * @param friendnumber
 	 *            the friendnumber to remove
 	 */

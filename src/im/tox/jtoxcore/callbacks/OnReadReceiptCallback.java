@@ -25,7 +25,7 @@ import im.tox.jtoxcore.ToxFriend;
 
 /**
  * Callback class for receiving read receipts
- * 
+ *
  * @author sonOfRa
  * @param <F>
  *            Friend type to use for this OnReadReceiptCallback instance
@@ -34,7 +34,7 @@ public interface OnReadReceiptCallback<F extends ToxFriend> {
 
 	/**
 	 * Method to be executed each time a read receipt is received
-	 * 
+	 *
 	 * @param friend
 	 *            the friend who sent the receipt
 	 * @param receipt

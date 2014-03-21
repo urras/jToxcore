@@ -22,9 +22,9 @@ package im.tox.jtoxcore;
 
 /**
  * Enum for Tox Error codes while adding friends
- * 
+ *
  * @author sonOfRa
- * 
+ *
  */
 public enum ToxError {
 	/**

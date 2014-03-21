@@ -1,0 +1,11 @@
+--style=java
+	--pad-header
+	--max-code-length=120
+	--convert-tabs
+	--pad-oper
+	--indent-switches
+	--align-pointer=name
+	--align-reference=name
+	--preserve-date
+	--break-blocks
+	--indent=force-tab

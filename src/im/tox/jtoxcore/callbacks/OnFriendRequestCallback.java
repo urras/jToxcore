@@ -22,15 +22,15 @@ package im.tox.jtoxcore.callbacks;
 
 /**
  * Callback class for receiving friend requests
- * 
+ *
  * @author sonOfRa
- * 
+ *
  */
 public interface OnFriendRequestCallback {
 
 	/**
 	 * Method to be executed each time a friend request is received
-	 * 
+	 *
 	 * @param publicKey
 	 *            the friend's public key
 	 * @param message

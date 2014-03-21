@@ -25,7 +25,7 @@ import im.tox.jtoxcore.ToxUserStatus;
 
 /**
  * Callback for receiving user status changes
- * 
+ *
  * @author sonOfRa
  * @param <F>
  *            Friend type to use with this OnUserStatusCallback instance
@@ -34,7 +34,7 @@ public interface OnUserStatusCallback<F extends ToxFriend> {
 
 	/**
 	 * Method to be executed each time a friend changes their status message
-	 * 
+	 *
 	 * @param friend
 	 *            the friend who changed their status
 	 * @param userstatus

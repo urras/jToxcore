@@ -1,5 +1,5 @@
 /* ToxFriend.java
- * 
+ *
  *  Copyright (C) 2013 Tox project All Rights Reserved.
  *
  *  This file is part of jToxcore
@@ -23,7 +23,7 @@ package im.tox.jtoxcore;
 /**
  * Interface for a Friend in Tox. This interface only supplies very basic
  * operations needed for the core workings of Tox
- * 
+ *
  * The setters are used by internal mechanisms of JToxcore. They should never
  * need to be called manually
  *

@@ -19,10 +19,10 @@
  *
  */
 typedef struct {
-    Tox *tox;
-    JavaVM *jvm;
-    jobject handler;
-    jobject jtox;
+	Tox *tox;
+	JavaVM *jvm;
+	jobject handler;
+	jobject jtox;
 } tox_jni_globals_t;
 
 static void callback_friendrequest(Tox *, uint8_t *, uint8_t *, uint16_t, void *);

@@ -24,7 +24,7 @@ import im.tox.jtoxcore.ToxFriend;
 
 /**
  * Callback class for receiving messages
- * 
+ *
  * @author sonOfRa
  * @param <F>
  *            Friend type to use with the OnMessageCallback instance
@@ -33,7 +33,7 @@ public interface OnMessageCallback<F extends ToxFriend> {
 
 	/**
 	 * Method to be executed each time a message is received
-	 * 
+	 *
 	 * @param friend
 	 *            the friend who sent the message
 	 * @param message
