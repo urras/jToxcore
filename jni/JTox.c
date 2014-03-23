@@ -98,6 +98,8 @@ JNIEXPORT jlong JNICALL Java_im_tox_jtoxcore_JTox_tox_1new(JNIEnv *env, jobject 
 
 	tox_callback_user_status(globals->tox, callback_userstatus, globals);
 
+	tox_callback_typing_change(globals->tox, callback_typingstatus, globals);
+
 	return ((jlong) ((intptr_t) globals));
 }
 
@@ -505,6 +507,34 @@ JNIEXPORT jintArray JNICALL Java_im_tox_jtoxcore_JTox_tox_1get_1friendlist(JNIEn
 	return arr;
 }
 
+JNIEXPORT jboolean JNICALL Java_im_tox_jtoxcore_JTox_tox_1set_1user_1is_1typing
+(JNIEnv *env, jobject obj, jlong messenger, jint friendnumber, jboolean typing)
+{
+	Tox *tox = ((tox_jni_globals_t *)((intptr_t) messenger))->tox;
+	uint8_t is_typing;
+
+	if (typing == JNI_TRUE) {
+		is_typing = 1;
+	} else {
+		is_typing = 0;
+	}
+
+	UNUSED(env);
+	UNUSED(obj);
+	return tox_set_user_is_typing(tox, friendnumber, is_typing) ? JNI_TRUE : JNI_FALSE;
+}
+
+JNIEXPORT jboolean JNICALL Java_im_tox_jtoxcore_JTox_tox_1get_1is_1typing
+  (JNIEnv *env, jobject obj, jlong messenger, jint friendnumber)
+  {
+  	Tox *tox = ((tox_jni_globals_t *) ((intptr_t) messenger))->tox;
+
+  	uint8_t is_typing = tox_get_is_typing(tox, friendnumber);
+
+  	UNUSED(env);
+  	UNUSED(obj);
+  	return is_typing == 1 ? JNI_TRUE : JNI_FALSE;
+  }
 /**
  * End general section
  */
@@ -710,6 +740,30 @@ static void callback_connectionstatus(Tox *tox, int32_t friendnumber, uint8_t ne
 	_newstatus = newstatus == 0 ? JNI_FALSE : JNI_TRUE;
 	(*env)->CallVoidMethod(env, ptr->jtox, jtoxmeth, friendnumber, _newstatus);
 	(*env)->CallVoidMethod(env, ptr->handler, handlermeth, friendnumber, _newstatus);
+
+	UNUSED(tox);
+}
+
+static void callback_typingstatus(Tox *tox, int32_t friendnumber, uint8_t is_typing, void *rptr)
+{
+	tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
+	JNIEnv *env;
+	jclass handlerclass;
+	jmethodID handlermeth;
+
+	jclass jtoxclass;
+	jmethodID jtoxmeth;
+
+	jboolean _is_typing;
+
+	ATTACH_THREAD(ptr, env);
+	handlerclass = (*env)->GetObjectClass(env, ptr->handler);
+	handlermeth = (*env)->GetMethodID(env, handlerclass, "onTypingChange", "(IZ)V");
+	jtoxclass = (*env)->GetObjectClass(env, ptr->jtox);
+	jtoxmeth = (*env)->GetMethodID(env, jtoxclass, "onTypingChange", "(IZ)V");
+	_is_typing = is_typing == 0 ? JNI_FALSE : JNI_TRUE;
+	(*env)->CallVoidMethod(env, ptr->jtox, jtoxmeth, friendnumber, _is_typing);
+	(*env)->CallVoidMethod(env, ptr->handler, handlermeth, friendnumber, _is_typing);
 
 	UNUSED(tox);
 }

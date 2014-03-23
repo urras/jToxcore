@@ -1,6 +1,6 @@
 /* JTox.java
  *
- *  Copyright (C) 2013 Tox project All Rights Reserved.
+ *  Copyright (C) 2013-2014 Tox project All Rights Reserved.
  *
  *  This file is part of jToxcore
  *
@@ -698,6 +698,39 @@ public class JTox<F extends ToxFriend> {
 	}
 
 	/**
+	 * Native call to tox_set_user_is_typing
+	 * @param messengerPointer pointer to the internal messenger struct
+	 * @param friendnumber the friend's number
+	 * @param typing <code>true</code> indicates we are typing, <code>false</code> indicates we stopped typing
+	 * @return false on success, true on failure
+	 */
+	private native boolean tox_set_user_is_typing(long messengerPointer, int friendnumber, boolean typing);
+
+	/**
+	 * Indicate to the specified friend that we are currently typing
+	 * @param friendnumber the friend's number
+	 * @param typing <code>true</code> indicates we are typing, <code>false</code> indicates we stopped typing
+	 * @throws ToxException if the instance has been killed
+	 */
+	public void sendIsTyping(int friendnumber, boolean typing) throws ToxException {
+		boolean error;
+
+		this.lock.lock();
+
+		try {
+			checkPointer();
+
+			error = tox_set_user_is_typing(this.messengerPointer, friendnumber, typing);
+		} finally {
+			this.lock.unlock();
+		}
+
+		if (error) {
+			throw new ToxException(ToxError.TOX_UNKNOWN);
+		}
+	}
+
+	/**
 	 * Native call to tox_do
 	 *
 	 * @param messengerPointer
@@ -911,13 +944,12 @@ public class JTox<F extends ToxFriend> {
 
 	/**
 	 * Refresh the friend list, looking for new friends, status changes, name
-	 * changes etc. (This function is probably not needed, and will possibly
-	 * become private in later versions)
+	 * changes etc. Generally, the core should keep this
 	 *
 	 * @throws ToxException
 	 *             if the instance was killed, or an internal error occured
 	 */
-	private void refreshList() throws ToxException {
+	public void refreshList() throws ToxException {
 		for (int i : getInternalFriendList()) {
 			this.friendList.addFriendIfNotExists(i);
 			refreshClientId(i);
@@ -984,7 +1016,7 @@ public class JTox<F extends ToxFriend> {
 	 *             if the instance has been killed, or an error occurred when
 	 *             attempting to fetch the client id
 	 */
-	private void refreshClientId(int friendnumber) throws ToxException {
+	public void refreshClientId(int friendnumber) throws ToxException {
 		String result;
 		this.lock.lock();
 
@@ -1021,7 +1053,7 @@ public class JTox<F extends ToxFriend> {
 	 *             if the instance has been killed, or an error occurred when
 	 *             attempting to fetch the connection status
 	 */
-	private void refreshFriendConnectionStatus(int friendnumber) throws ToxException {
+	public void refreshFriendConnectionStatus(int friendnumber) throws ToxException {
 		this.lock.lock();
 		int result;
 
@@ -1096,7 +1128,7 @@ public class JTox<F extends ToxFriend> {
 	 * @throws ToxException
 	 *             if the instance has been killed or an error occurred
 	 */
-	private void refreshFriendName(int friendnumber) throws ToxException {
+	public void refreshFriendName(int friendnumber) throws ToxException {
 		byte[] name;
 
 		this.lock.lock();
@@ -1136,7 +1168,7 @@ public class JTox<F extends ToxFriend> {
 	 *             if the instance has been killed, or an error occurred while
 	 *             getting the status message
 	 */
-	private void refreshStatusMessage(int friendnumber) throws ToxException {
+	public void refreshStatusMessage(int friendnumber) throws ToxException {
 		byte[] status;
 
 		this.lock.lock();
@@ -1175,7 +1207,7 @@ public class JTox<F extends ToxFriend> {
 	 * @throws ToxException
 	 *             if the instance has been killed
 	 */
-	private void refreshUserStatus(int friendnumber) throws ToxException {
+	public void refreshUserStatus(int friendnumber) throws ToxException {
 		ToxUserStatus status = ToxUserStatus.TOX_USERSTATUS_INVALID;
 
 		this.lock.lock();
@@ -1189,6 +1221,32 @@ public class JTox<F extends ToxFriend> {
 		}
 
 		this.friendList.getByFriendNumber(friendnumber).setStatus(status);
+	}
+
+	/**
+	 * Native call to tox_get_is_typing
+	 * @param messengerPointer pointer to the internal messenger struct
+	 * @param friendnumber the friend's number
+	 * @return <code>true</code> if the friend is typing, <code>false</code> otherwise
+	 */
+	private native boolean tox_get_is_typing(long messengerPointer, int friendnumber);
+
+	/**
+	 * Refresh the typing status for the specified friend
+	 * @param friendnumber the friend's number
+	 * @throws ToxException if the instance has been killed
+	 */
+	public void refreshTypingStatus(int friendnumber) throws ToxException {
+		boolean result;
+		this.lock.lock();
+		try {
+			checkPointer();
+
+			result = tox_get_is_typing(this.messengerPointer, friendnumber);
+		} finally {
+			this.lock.unlock();
+		}
+		this.friendList.getByFriendNumber(friendnumber).setTyping(result);
 	}
 
 	/**
@@ -1237,6 +1295,15 @@ public class JTox<F extends ToxFriend> {
 	 */
 	private void onUserStatus(int friendnumber, ToxUserStatus newStatus) {
 		this.friendList.getByFriendNumber(friendnumber).setStatus(newStatus);
+	}
+
+	/**
+	 * Update the user typing status if a typing change callback is invoked
+	 * @param friendnumber the friendnumber
+	 * @param isTyping the friend's typing status
+	 */
+	private void onTypingChange(int friendnumber, boolean isTyping) {
+		this.friendList.getByFriendNumber(friendnumber).setTyping(isTyping);
 	}
 
 	/**

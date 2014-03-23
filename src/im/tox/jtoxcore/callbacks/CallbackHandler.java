@@ -49,6 +49,7 @@ public class CallbackHandler<F extends ToxFriend> {
 	private List<OnReadReceiptCallback<F>> onReadReceiptCallbacks;
 	private List<OnStatusMessageCallback<F>> onStatusMessageCallbacks;
 	private List<OnUserStatusCallback<F>> onUserStatusCallbacks;
+	private List<OnTypingChangeCallback<F>> onTypingChangeCallbacks;
 
 	private FriendList<F> friendlist;
 
@@ -70,6 +71,7 @@ public class CallbackHandler<F extends ToxFriend> {
 		this.onReadReceiptCallbacks = Collections.synchronizedList(new ArrayList<OnReadReceiptCallback<F>>());
 		this.onStatusMessageCallbacks = Collections.synchronizedList(new ArrayList<OnStatusMessageCallback<F>>());
 		this.onUserStatusCallbacks = Collections.synchronizedList(new ArrayList<OnUserStatusCallback<F>>());
+		this.onTypingChangeCallbacks = Collections.synchronizedList(new ArrayList<OnTypingChangeCallback<F>>());
 	}
 
 	/**
@@ -630,5 +632,68 @@ public class CallbackHandler<F extends ToxFriend> {
 	public <T extends OnUserStatusCallback<F>> void setOnUserStatusCallbacks(List<T> callbacks) {
 		clearOnUserStatusCallbacks();
 		registerOnUserStatusCallbacks(callbacks);
+	}
+
+	/**
+	 * Hook for native API to invoke callback methods
+	 *
+	 * @param friendnumber
+	 *            the friend who changed their typing status
+	 * @param isTyping
+	 *            <code>true</code> if the user is typing now, <code>false</code>otherwise
+	 */
+	@SuppressWarnings("unused")
+	private void onTypingChange(int friendnumber, boolean isTyping) {
+		F friend = this.friendlist.getByFriendNumber(friendnumber);
+
+		synchronized (this.onTypingChangeCallbacks) {
+			for(OnTypingChangeCallback<F> callback : this.onTypingChangeCallbacks) {
+				callback.execute(friend, isTyping);
+			}
+		}
+	}
+
+	/**
+	 * Add the specified callback
+	 *
+	 * @param callback
+	 *            callback to add
+	 */
+	public void registerOnTypingChangeCallback(OnTypingChangeCallback<F> callback) {
+		this.onTypingChangeCallbacks.add(callback);
+	}
+
+	/**
+	 * Remove the specified callback
+	 * @param callback callback to remove
+	 */
+	public void unregisterOnTypingChangeCallback(OnTypingChangeCallback<F> callback) {
+		this.onTypingChangeCallbacks.remove(callback);
+	}
+
+	/**
+	 * Remove all callbacks
+	 */
+	public void clearOnTypingChangeCallbacks() {
+		this.onTypingChangeCallbacks.clear();
+	}
+
+	/**
+	 * Add the specified callbacks
+	 * @param callbacks the callbacks to add
+	 */
+	public <T extends OnTypingChangeCallback<F>> void registerOnTypingChangeCallbacks(List<T> callbacks) {
+		for(T callback : callbacks) {
+			registerOnTypingChangeCallback(callback);
+		}
+	}
+
+	/**
+	 * Set the specified callbacks. All previously existing callbacks will be removed
+	 * @param callbacks the callbacks to set
+	 */
+	public <T extends OnTypingChangeCallback<F>> void setOnTypingChangeCallbacks(List<T> callbacks) {
+		clearOnTypingChangeCallbacks();
+		registerOnTypingChangeCallbacks(callbacks);
 	}
 }

@@ -1,6 +1,6 @@
 /* ToxFriend.java
  *
- *  Copyright (C) 2013 Tox project All Rights Reserved.
+ *  Copyright (C) 2013-2014 Tox project All Rights Reserved.
  *
  *  This file is part of jToxcore
  *
@@ -62,6 +62,11 @@ public interface ToxFriend {
 	int getFriendnumber();
 
 	/**
+	 * @return whether the Friend is typing
+	 */
+	boolean isTyping();
+
+	/**
 	 * @param id
 	 *            the id to set
 	 */
@@ -90,4 +95,10 @@ public interface ToxFriend {
 	 *            set whether Friend is online
 	 */
 	void setOnline(boolean online);
+
+	/**
+	 *
+	 * @param typing set whether the Friend is typing
+	 */
+	void setTyping(boolean typing);
 }

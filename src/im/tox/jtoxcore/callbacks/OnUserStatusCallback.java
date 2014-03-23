@@ -40,5 +40,5 @@ public interface OnUserStatusCallback<F extends ToxFriend> {
 	 * @param userstatus
 	 *            the new status message
 	 */
-	public abstract void execute(F friend, ToxUserStatus userstatus);
+	void execute(F friend, ToxUserStatus userstatus);
 }
