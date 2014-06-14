@@ -1,4 +1,4 @@
-/* OnStatusMessageCallback.java
+/* OnFileSendRequestCallback.java
  *
  *  Copyright (C) 2014 Tox project All Rights Reserved.
  *

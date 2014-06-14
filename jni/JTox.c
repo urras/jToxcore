@@ -1,6 +1,6 @@
 /* JTox.c
  *
- *  Copyright (C) 2013 Tox project All Rights Reserved.
+ *  Copyright (C) 2014 Tox project All Rights Reserved.
  *
  *  This file is part of jToxcore
  *
@@ -418,47 +418,56 @@ JNIEXPORT jobjectArray JNICALL Java_im_tox_jtoxcore_JTox_tox_lgroup_lget_lnames(
 */
 
 // FILE SENDING BEGINS
-JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lnew_lfile_lsender(JNIEnv *env, jobject obj, jlong messenger, jint friendnumber, jlong filesize, jbyteArray filename, jint length)
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lnew_lfile_lsender(JNIEnv *env, jobject obj, jlong messenger,
+		jint friendnumber, jlong filesize, jbyteArray filename, jint length)
 {
 	jbyte *_filename = (*env)->GetByteArrayElements(env, filename, 0);
-    int result = tox_new_file_sender(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, friendnumber, filesize, (uint8_t *) _filename, length);
+	int result = tox_new_file_sender(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, friendnumber, filesize,
+									 (uint8_t *) _filename, length);
 	(*env)->ReleaseByteArrayElements(env, filename, _filename, JNI_ABORT);
 	UNUSED(obj);
-    return result;
+	return result;
 }
 
-JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lfile_lsend_lcontrol(JNIEnv *env, jobject obj, jlong messenger, jint friendnumber, jint send_receive, jint filenumber, jint message_id, jbyteArray data, jint length)
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lfile_lsend_lcontrol(JNIEnv *env, jobject obj, jlong messenger,
+		jint friendnumber, jint send_receive, jint filenumber, jint message_id, jbyteArray data, jint length)
 {
 	jbyte *_data = (*env)->GetByteArrayElements(env, data, 0);
-    int result = tox_file_send_control(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, friendnumber, send_receive, filenumber, message_id, (uint8_t *) _data, length);
+	int result = tox_file_send_control(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, friendnumber, send_receive,
+									   filenumber, message_id, (uint8_t *) _data, length);
 	(*env)->ReleaseByteArrayElements(env, data, _data, JNI_ABORT);
 	UNUSED(obj);
-    return result;
+	return result;
 }
 
-JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lfile_lsend_ldata(JNIEnv *env, jobject obj, jlong messenger, jint friendnumber, jint filenumber, jbyteArray data, jint length)
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lfile_lsend_ldata(JNIEnv *env, jobject obj, jlong messenger,
+		jint friendnumber, jint filenumber, jbyteArray data, jint length)
 {
 	jbyte *_data = (*env)->GetByteArrayElements(env, data, 0);
-    int result = tox_file_send_data(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, friendnumber, filenumber, (uint8_t *) _data, length);
+	int result = tox_file_send_data(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, friendnumber, filenumber,
+									(uint8_t *) _data, length);
 	(*env)->ReleaseByteArrayElements(env, data, _data, JNI_ABORT);
 	UNUSED(obj);
-    return result;
+	return result;
 }
 
-JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lfile_ldata_lsize(JNIEnv *env, jobject obj, jlong messenger, jint friendnumber)
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lfile_ldata_lsize(JNIEnv *env, jobject obj, jlong messenger,
+		jint friendnumber)
 {
-    int result = tox_file_data_size(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, friendnumber);
+	int result = tox_file_data_size(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, friendnumber);
 	UNUSED(obj);
 	UNUSED(env);
-    return result;
+	return result;
 }
 
-JNIEXPORT jlong JNICALL Java_im_tox_jtoxcore_JTox_tox_lfile_ldata_lremaining(JNIEnv *env, jobject obj, jlong messenger, jint friendnumber, jint filenumber, jint send_receive)
+JNIEXPORT jlong JNICALL Java_im_tox_jtoxcore_JTox_tox_lfile_ldata_lremaining(JNIEnv *env, jobject obj, jlong messenger,
+		jint friendnumber, jint filenumber, jint send_receive)
 {
-    long result = tox_file_data_remaining(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, friendnumber, filenumber, send_receive);
+	long result = tox_file_data_remaining(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, friendnumber, filenumber,
+										  send_receive);
 	UNUSED(obj);
 	UNUSED(env);
-    return result;
+	return result;
 }
 // FILE SENDING ENDS
 
@@ -620,16 +629,16 @@ JNIEXPORT jboolean JNICALL Java_im_tox_jtoxcore_JTox_tox_1set_1user_1is_1typing
 }
 
 JNIEXPORT jboolean JNICALL Java_im_tox_jtoxcore_JTox_tox_1get_1is_1typing
-  (JNIEnv *env, jobject obj, jlong messenger, jint friendnumber)
-  {
-  	Tox *tox = ((tox_jni_globals_t *) ((intptr_t) messenger))->tox;
+(JNIEnv *env, jobject obj, jlong messenger, jint friendnumber)
+{
+	Tox *tox = ((tox_jni_globals_t *) ((intptr_t) messenger))->tox;
 
-  	uint8_t is_typing = tox_get_is_typing(tox, friendnumber);
+	uint8_t is_typing = tox_get_is_typing(tox, friendnumber);
 
-  	UNUSED(env);
-  	UNUSED(obj);
-  	return is_typing == 1 ? JNI_TRUE : JNI_FALSE;
-  }
+	UNUSED(env);
+	UNUSED(obj);
+	return is_typing == 1 ? JNI_TRUE : JNI_FALSE;
+}
 /**
  * End general section
  */
@@ -637,19 +646,20 @@ JNIEXPORT jboolean JNICALL Java_im_tox_jtoxcore_JTox_tox_1get_1is_1typing
 /**
  * Begin Callback Section
  */
-static void callback_filecontrol(Tox *tox, int32_t friendnumber, uint8_t receive_send, uint8_t filenumber, uint8_t control_type, uint8_t *data, uint16_t length, void *rptr)
+static void callback_filecontrol(Tox *tox, int32_t friendnumber, uint8_t receive_send, uint8_t filenumber,
+								 uint8_t control_type, uint8_t *data, uint16_t length, void *rptr)
 {
-    tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
-    JNIEnv *env;
-    jclass handlerclass;
-    jmethodID handlermeth;
-    jbyteArray _data;
-    jclass control_enum;
+	tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
+	JNIEnv *env;
+	jclass handlerclass;
+	jmethodID handlermeth;
+	jbyteArray _data;
+	jclass control_enum;
 	char *enum_name;
 	jfieldID fieldID;
 	jobject enum_val;
 
-    ATTACH_THREAD(ptr, env);
+	ATTACH_THREAD(ptr, env);
 	handlerclass = (*env)->GetObjectClass(env, ptr->handler);
 	handlermeth = (*env)->GetMethodID(env, handlerclass, "onFileControl",
 									  "(IIILim/tox/jtoxcore/ToxFileControl;[B)V");
@@ -681,49 +691,51 @@ static void callback_filecontrol(Tox *tox, int32_t friendnumber, uint8_t receive
 	fieldID = (*env)->GetStaticFieldID(env, control_enum, enum_name, "Lim/tox/jtoxcore/ToxFileControl;");
 	enum_val = (*env)->GetStaticObjectField(env, control_enum, fieldID);
 
-    _data = (*env)->NewByteArray(env, length);
+	_data = (*env)->NewByteArray(env, length);
 	(*env)->SetByteArrayRegion(env, _data, 0, length, (jbyte *) data);
 
-    (*env)->CallVoidMethod(env, ptr->handler, handlermeth, friendnumber, receive_send, filenumber, enum_val, _data);
-    UNUSED(tox);
+	(*env)->CallVoidMethod(env, ptr->handler, handlermeth, friendnumber, receive_send, filenumber, enum_val, _data);
+	UNUSED(tox);
 }
 
-static void callback_filedata(Tox *tox, int32_t friendnumber, uint8_t filenumber, uint8_t *data, uint16_t length, void *rptr)
+static void callback_filedata(Tox *tox, int32_t friendnumber, uint8_t filenumber, uint8_t *data, uint16_t length,
+							  void *rptr)
 {
-    tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
-    JNIEnv *env;
-    jclass clazz;
-    jmethodID meth;
-    jbyteArray _data;
+	tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
+	JNIEnv *env;
+	jclass clazz;
+	jmethodID meth;
+	jbyteArray _data;
 
-    ATTACH_THREAD(ptr, env);
+	ATTACH_THREAD(ptr, env);
 	clazz = (*env)->GetObjectClass(env, ptr->handler);
 	meth = (*env)->GetMethodID(env, clazz, "onFileData", "(II[B)V");
 
-    _data = (*env)->NewByteArray(env, length);
+	_data = (*env)->NewByteArray(env, length);
 	(*env)->SetByteArrayRegion(env, _data, 0, length, (jbyte *) data);
 
-    (*env)->CallVoidMethod(env, ptr->handler, meth, friendnumber, filenumber, _data);
-    UNUSED(tox);
+	(*env)->CallVoidMethod(env, ptr->handler, meth, friendnumber, filenumber, _data);
+	UNUSED(tox);
 }
 
-static void callback_filesendrequest(Tox *tox, int32_t friendnumber, uint8_t filenumber, uint64_t filesize, uint8_t *filename, uint16_t length, void *rptr)
+static void callback_filesendrequest(Tox *tox, int32_t friendnumber, uint8_t filenumber, uint64_t filesize,
+									 uint8_t *filename, uint16_t length, void *rptr)
 {
-    tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
-    JNIEnv *env;
-    jclass clazz;
-    jmethodID meth;
-    jbyteArray _filename;
+	tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
+	JNIEnv *env;
+	jclass clazz;
+	jmethodID meth;
+	jbyteArray _filename;
 
-    ATTACH_THREAD(ptr, env);
+	ATTACH_THREAD(ptr, env);
 	clazz = (*env)->GetObjectClass(env, ptr->handler);
 	meth = (*env)->GetMethodID(env, clazz, "onFileSendRequest", "(IIJ[B)V");
 
-    _filename = (*env)->NewByteArray(env, length);
+	_filename = (*env)->NewByteArray(env, length);
 	(*env)->SetByteArrayRegion(env, _filename, 0, length, (jbyte *) filename);
 
-    (*env)->CallVoidMethod(env, ptr->handler, meth, friendnumber, filenumber, filesize, _filename);
-    UNUSED(tox);
+	(*env)->CallVoidMethod(env, ptr->handler, meth, friendnumber, filenumber, filesize, _filename);
+	UNUSED(tox);
 }
 
 static void callback_friendrequest(Tox *tox, uint8_t *pubkey, uint8_t *message, uint16_t length, void *rptr)

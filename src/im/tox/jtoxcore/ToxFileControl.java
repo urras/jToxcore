@@ -1,6 +1,6 @@
-/* ToxUserStatus.java
+/* ToxFileControl.java
  *
- *  Copyright (C) 2013 Tox project All Rights Reserved.
+ *  Copyright (C) 2014 Tox project All Rights Reserved.
  *
  *  This file is part of jToxcore
  *
@@ -22,9 +22,9 @@
 package im.tox.jtoxcore;
 
 public enum ToxFileControl {
-    TOX_FILECONTROL_ACCEPT,
-    TOX_FILECONTROL_PAUSE,
-    TOX_FILECONTROL_KILL,
-    TOX_FILECONTROL_FINISHED,
-    TOX_FILECONTROL_RESUME_BROKEN
+	TOX_FILECONTROL_ACCEPT,
+	TOX_FILECONTROL_PAUSE,
+	TOX_FILECONTROL_KILL,
+	TOX_FILECONTROL_FINISHED,
+	TOX_FILECONTROL_RESUME_BROKEN
 }

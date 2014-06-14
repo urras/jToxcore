@@ -1,6 +1,6 @@
 /* callbacks.h
  *
- *  Copyright (C) 2013 Tox project All Rights Reserved.
+ *  Copyright (C) 2014 Tox project All Rights Reserved.
  *
  *  This file is part of jToxcore
  *
@@ -33,7 +33,7 @@ static void callback_statusmessage(Tox *, int32_t, uint8_t *, uint16_t, void *);
 static void callback_userstatus(Tox *, int32_t, uint8_t, void *);
 static void callback_read_receipt(Tox *, int32_t, uint32_t, void *);
 static void callback_connectionstatus(Tox *, int32_t, uint8_t, void *);
-static void callback_typingstatus(Tox *, int32_t, uint8_t, void*);
-static void callback_filecontrol(Tox *, int32_t, uint8_t, uint8_t, uint8_t, uint8_t *, uint16_t, void*);
-static void callback_filedata(Tox *, int32_t, uint8_t, uint8_t *, uint16_t, void*);
-static void callback_filesendrequest(Tox *, int32_t, uint8_t, uint64_t, uint8_t *, uint16_t, void*);
+static void callback_typingstatus(Tox *, int32_t, uint8_t, void *);
+static void callback_filecontrol(Tox *, int32_t, uint8_t, uint8_t, uint8_t, uint8_t *, uint16_t, void *);
+static void callback_filedata(Tox *, int32_t, uint8_t, uint8_t *, uint16_t, void *);
+static void callback_filesendrequest(Tox *, int32_t, uint8_t, uint64_t, uint8_t *, uint16_t, void *);
