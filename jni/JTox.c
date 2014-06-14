@@ -643,8 +643,6 @@ static void callback_filecontrol(Tox *tox, int32_t friendnumber, uint8_t receive
     JNIEnv *env;
     jclass handlerclass;
     jmethodID handlermeth;
-    jclass jtoxclass;
-    jmethodID jtoxmeth;
     jbyteArray _data;
     jclass control_enum;
 	char *enum_name;
@@ -655,8 +653,6 @@ static void callback_filecontrol(Tox *tox, int32_t friendnumber, uint8_t receive
 	handlerclass = (*env)->GetObjectClass(env, ptr->handler);
 	handlermeth = (*env)->GetMethodID(env, handlerclass, "onFileControl",
 									  "(IIILim/tox/jtoxcore/ToxFileControl;[B)V");
-	jtoxclass = (*env)->GetObjectClass(env, ptr->jtox);
-	jtoxmeth = (*env)->GetMethodID(env, jtoxclass, "onFileControl", "(IIILim/tox/jtoxcore/ToxFileControl;[B)V");
 
 	control_enum = (*env)->FindClass(env, "im/tox/jtoxcore/ToxFileControl");
 
@@ -689,7 +685,6 @@ static void callback_filecontrol(Tox *tox, int32_t friendnumber, uint8_t receive
 	(*env)->SetByteArrayRegion(env, _data, 0, length, (jbyte *) data);
 
     (*env)->CallVoidMethod(env, ptr->handler, handlermeth, friendnumber, receive_send, filenumber, enum_val, _data);
-    (*env)->CallVoidMethod(env, ptr->jtox, jtoxmeth, friendnumber, receive_send, filenumber, enum_val, _data);
     UNUSED(tox);
 }
 
