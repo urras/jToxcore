@@ -22,8 +22,9 @@
 package im.tox.jtoxcore.callbacks;
 
 import im.tox.jtoxcore.ToxFriend;
+import im.tox.jtoxcore.ToxFileControl;
 
 public interface OnFileControlCallback<F extends ToxFriend> {
 
-	void execute(F friend, boolean sending, int control_type, byte[] data);
+	void execute(F friend, boolean sending, ToxFileControl control_type, byte[] data);
 }

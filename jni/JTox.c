@@ -641,18 +641,55 @@ static void callback_filecontrol(Tox *tox, int32_t friendnumber, uint8_t receive
 {
     tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
     JNIEnv *env;
-    jclass clazz;
-    jmethodID meth;
+    jclass handlerclass;
+    jmethodID handlermeth;
+    jclass jtoxclass;
+    jmethodID jtoxmeth;
     jbyteArray _data;
+    jclass control_enum;
+	char *enum_name;
+	jfieldID fieldID;
+	jobject enum_val;
 
     ATTACH_THREAD(ptr, env);
-	clazz = (*env)->GetObjectClass(env, ptr->handler);
-	meth = (*env)->GetMethodID(env, clazz, "onFileControl", "(IIII[B)V");
+	handlerclass = (*env)->GetObjectClass(env, ptr->handler);
+	handlermeth = (*env)->GetMethodID(env, handlerclass, "onFileControl",
+									  "(IIILim/tox/jtoxcore/ToxFileControl;[B)V");
+	jtoxclass = (*env)->GetObjectClass(env, ptr->jtox);
+	jtoxmeth = (*env)->GetMethodID(env, jtoxclass, "onFileControl", "(IIILim/tox/jtoxcore/ToxFileControl;[B)V");
+
+	control_enum = (*env)->FindClass(env, "im/tox/jtoxcore/ToxFileControl");
+
+	switch (control_type) {
+		case TOX_FILECONTROL_ACCEPT:
+			enum_name = "TOX_FILECONTROL_ACCEPT";
+			break;
+
+		case TOX_FILECONTROL_PAUSE:
+			enum_name = "TOX_FILECONTROL_PAUSE";
+			break;
+
+		case TOX_FILECONTROL_KILL:
+			enum_name = "TOX_FILECONTROL_KILL";
+			break;
+
+		case TOX_FILECONTROL_FINISHED:
+			enum_name = "TOX_FILECONTROL_FINISHED";
+			break;
+
+		default:
+			enum_name = "TOX_FILECONTROL_RESUME_BROKEN";
+			break;
+	}
+
+	fieldID = (*env)->GetStaticFieldID(env, control_enum, enum_name, "Lim/tox/jtoxcore/ToxFileControl;");
+	enum_val = (*env)->GetStaticObjectField(env, control_enum, fieldID);
 
     _data = (*env)->NewByteArray(env, length);
 	(*env)->SetByteArrayRegion(env, _data, 0, length, (jbyte *) data);
 
-    (*env)->CallVoidMethod(env, ptr->handler, meth, friendnumber, receive_send, filenumber, control_type, _data);
+    (*env)->CallVoidMethod(env, ptr->handler, handlermeth, friendnumber, receive_send, filenumber, enum_val, _data);
+    (*env)->CallVoidMethod(env, ptr->jtox, jtoxmeth, friendnumber, receive_send, filenumber, enum_val, _data);
     UNUSED(tox);
 }
 

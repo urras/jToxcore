@@ -28,6 +28,7 @@ import java.util.List;
 import im.tox.jtoxcore.FriendList;
 import im.tox.jtoxcore.JTox;
 import im.tox.jtoxcore.ToxFriend;
+import im.tox.jtoxcore.ToxFileControl;
 import im.tox.jtoxcore.ToxUserStatus;
 
 /**
@@ -301,7 +302,7 @@ public class CallbackHandler<F extends ToxFriend> {
      *            the message
      */
     @SuppressWarnings("unused")
-    private void onFileControl(int friendnumber, int receive_send, int control_type, byte[] data) {
+    private void onFileControl(int friendnumber, int receive_send, ToxFileControl control_type, byte[] data) {
         F friend = this.friendlist.getByFriendNumber(friendnumber);
         boolean sending;
         if (receive_send == 1) {
