@@ -1249,6 +1249,185 @@ public class JTox<F extends ToxFriend> {
 		this.friendList.getByFriendNumber(friendnumber).setTyping(result);
 	}
 
+    /****** GROUP CHAT FUNCTIONS ******/
+
+    /**
+     * Creates a new groupchat and puts it in the chats array.
+     * @param messengerPointer pointer to the internal messenger struct
+     * @return group number on success, -1 on failure
+     *
+    private native int tox_add_groupchat(long messengerPointer);
+
+    /**
+     * Delete a groupchat from the chats array.
+     * @param messengerPointer pointer to the internal messenger struct
+     * @param groupnumber group to delete
+     * @return false on success, true on failure
+     *
+    private native boolean tox_del_groupchat(long messengerPointer, int groupnumber);
+
+    /**
+     * Return the name of peernumber who is in groupnumber
+     * @param messengerPointer pointer to the internal messenger struct
+     * @param groupnumber
+     * @param peernumber
+     * @return the name of the peer as a byte array
+     *
+    private native byte[] tox_group_peername(long messengerPointer, int groupnumber, int peernumber);
+
+    /**
+     * Invite friendnumber to groupnumber
+     * @param messengerPointer pointer to the internal messenger struct
+     * @param friendnumber
+     * @param groupnumber
+     * @return false on success, true on failure
+     *
+    private native boolean tox_invite_friend(long messengerPointer, int friendnumber, int groupnumber);
+
+    /**
+     * Join a group (you need to have been invited first.)
+     * @param messengerPointer pointer to the internal messenger struct
+     * @param friendnumber
+     * @param friend_group_public_key
+     * @return group number on success, -1 on failure
+     *
+    private native int tox_join_groupchat(long messengerPointer, int friendnumber,
+                                          byte[] friend_group_public_key);
+
+    /**
+     * Sends a group message
+     * @param messengerPointer pointer to the internal messenger struct
+     * @param groupnumber
+     * @param message
+     * @param length
+     * @return false on success, true on failure
+     *
+    private native boolean tox_group_message_send(long messengerPointer, int groupnumber,
+                                                  byte[] message, int length);
+
+    /**
+     * Send a group action
+     * @param messengerPointer
+     * @param groupnumber
+     * @param action
+     * @param length
+     * @return false on success, true on failure
+     *
+    private native boolean tox_group_action_send(long messengerPointer, int groupnumber,
+                                             byte[] action, int length);
+
+    /**
+     * Return the number of peers in the group chat on success.
+     * @param messengerPointer
+     * @param groupnumber
+     * @return the number of peers in the group chat on success, -1 on failure
+     *
+    private native int tox_group_number_peers(long messengerPointer, int groupnumber);
+
+    *
+    private native byte[][] tox_group_get_names(long messengerPointer, int groupnumber);
+
+    public byte[][] toxGroupGetNames(int groupnumber) throws ToxException {
+		byte[][] result;
+		this.lock.lock();
+		try {
+			checkPointer();
+			result = tox_group_get_names(this.messengerPointer, groupnumber);
+		} finally {
+			this.lock.unlock();
+		}
+        return result;
+	}
+    */
+
+    /****** GROUP CHAT FUNCTIONS END ******/
+    /****** FILE SENDING FUNCTIONS BEGIN ******/
+    private native int tox_new_file_sender(long messengerPointer, int friendnumber, long filesize, byte[] filename, int length);
+
+    public int toxNewFileSender(int friendnumber, long filesize, String filename) throws ToxException {
+        int result;
+        byte[] _filename = filename.getBytes(Charset.forName("UTF-8"));
+        this.lock.lock();
+        try {
+            checkPointer();
+            result = tox_new_file_sender(this.messengerPointer, friendnumber, filesize, _filename, _filename.length);
+        } finally {
+            this.lock.unlock();
+        }
+        return result;
+    }
+
+    private native int tox_file_send_control(long messengerPointer, int friendnumber, int send_receive, int filenumber, int message_id, byte[] data, int length);
+
+    public int toxFileSendControl(int friendnumber, boolean sending, int filenumber, int message_id, byte[] data) throws ToxException {
+        int result;
+        int send_receive;
+        if (sending) {
+            send_receive = 0;
+        } else {
+            send_receive = 1;
+        }
+        this.lock.lock();
+        try {
+            checkPointer();
+            result = tox_file_send_control(this.messengerPointer, friendnumber, send_receive, filenumber, message_id, data, data.length);
+        } finally {
+            this.lock.unlock();
+        }
+        return result;
+    }
+
+    private native int tox_file_send_data(long messengerPointer, int friendnumber, int filenumber, byte[] data, int length);
+
+    public int toxFileSendData(int friendnumber, int filenumber, byte[] data) throws ToxException {
+        int result;
+        this.lock.lock();
+        try {
+            checkPointer();
+            result = tox_file_send_data(this.messengerPointer, friendnumber,filenumber, data, data.length);
+        } finally {
+            this.lock.unlock();
+        }
+        return result;
+    }
+
+    private native int tox_file_data_size(long messengerPointer, int friendnumber);
+
+    public int toxFileDataSize(int friendnumber) throws ToxException {
+        int result;
+        this.lock.lock();
+        try {
+            checkPointer();
+            result = tox_file_data_size(this.messengerPointer, friendnumber);
+        } finally {
+            this.lock.unlock();
+        }
+        return result;
+    }
+
+    private native long tox_file_data_remaining(long messengerPointer, int friendnumber, int filenumber, int send_receive);
+
+    public long toxFileDataRemaining(int friendnumber, int filenumber, boolean sending) throws ToxException {
+        long result;
+        int send_receive;
+        if (sending) {
+            send_receive = 0;
+        } else {
+            send_receive = 1;
+        }
+        this.lock.lock();
+        try {
+            checkPointer();
+            result = tox_file_data_remaining(this.messengerPointer, friendnumber, filenumber, send_receive);
+        } finally {
+            this.lock.unlock();
+        }
+        return result;
+    }
+    /****** FILE SENDING FUNCTIONS END ******/
+
+
+
 	/**
 	 * Update the connection status if a connection status callback is invoked
 	 *

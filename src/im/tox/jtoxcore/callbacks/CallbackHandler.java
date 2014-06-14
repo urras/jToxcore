@@ -50,6 +50,9 @@ public class CallbackHandler<F extends ToxFriend> {
 	private List<OnStatusMessageCallback<F>> onStatusMessageCallbacks;
 	private List<OnUserStatusCallback<F>> onUserStatusCallbacks;
 	private List<OnTypingChangeCallback<F>> onTypingChangeCallbacks;
+    private List<OnFileControlCallback<F>> onFileControlCallbacks;
+    private List<OnFileDataCallback<F>> onFileDataCallbacks;
+    private List<OnFileSendRequestCallback<F>> onFileSendRequestCallbacks;
 
 	private FriendList<F> friendlist;
 
@@ -72,6 +75,9 @@ public class CallbackHandler<F extends ToxFriend> {
 		this.onStatusMessageCallbacks = Collections.synchronizedList(new ArrayList<OnStatusMessageCallback<F>>());
 		this.onUserStatusCallbacks = Collections.synchronizedList(new ArrayList<OnUserStatusCallback<F>>());
 		this.onTypingChangeCallbacks = Collections.synchronizedList(new ArrayList<OnTypingChangeCallback<F>>());
+        this.onFileControlCallbacks = Collections.synchronizedList(new ArrayList<OnFileControlCallback<F>>());
+        this.onFileDataCallbacks = Collections.synchronizedList(new ArrayList<OnFileDataCallback<F>>());
+        this.onFileSendRequestCallbacks = Collections.synchronizedList(new ArrayList<OnFileSendRequestCallback<F>>());
 	}
 
 	/**
@@ -286,6 +292,216 @@ public class CallbackHandler<F extends ToxFriend> {
 		registerOnFriendRequestCallbacks(callbacks);
 	}
 
+    /**
+     * Hook for native API to invoke callback methods
+     *
+     * @param friendnumber
+     *            the friend who sent the message
+     * @param message
+     *            the message
+     */
+    @SuppressWarnings("unused")
+    private void onFileControl(int friendnumber, int receive_send, int control_type, byte[] data) {
+        F friend = this.friendlist.getByFriendNumber(friendnumber);
+        boolean sending;
+        if (receive_send == 1) {
+            sending = true;
+        } else {
+            sending = false;
+        }
+
+        synchronized (this.onMessageCallbacks) {
+            for (OnFileControlCallback<F> cb : this.onFileControlCallbacks) {
+                cb.execute(friend, sending, control_type, data);
+            }
+        }
+    }
+
+    /**
+     * Add the specified callback
+     *
+     * @param callback
+     *            callback to add
+     */
+    public void registerOnFileControlCallback(OnFileControlCallback<F> callback) {
+        this.onFileControlCallbacks.add(callback);
+    }
+
+    /**
+     * Remove the specified callback
+     *
+     * @param callback
+     *            callback to remove
+     */
+    public void unregisterOnFileControlCallback(OnFileControlCallback<F> callback) {
+        this.onFileControlCallbacks.remove(callback);
+    }
+
+    /**
+     * Remove all callbacks
+     */
+    public void clearOnFileControlCallbacks() {
+        this.onFileControlCallbacks.clear();
+    }
+
+    /**
+     * Add all specified callbacks
+     *
+     * @param callbacks
+     *            callbacks to add
+     */
+    public <T extends OnFileControlCallback<F>> void registerOnFileControlCallbacks(List<T> callbacks) {
+        for (T callback : callbacks) {
+            registerOnFileControlCallback(callback);
+        }
+    }
+
+    /**
+     * Set the specified callbacks. This removes all previously set callbacks
+     *
+     * @param callbacks
+     *            callbacks to set
+     */
+    public <T extends OnFileControlCallback<F>> void setOnFileControlCallbacks(List<T> callbacks) {
+        clearOnFileControlCallbacks();
+        registerOnFileControlCallbacks(callbacks);
+    }
+    /**
+     * Hook for native API to invoke callback methods
+     *
+     * @param friendnumber
+     *            the friend who sent the message
+     * @param message
+     *            the message
+     */
+    @SuppressWarnings("unused")
+    private void onFileData(int friendnumber, int filenumber, byte[] data) {
+        F friend = this.friendlist.getByFriendNumber(friendnumber);
+
+        synchronized (this.onMessageCallbacks) {
+            for (OnFileDataCallback<F> cb : this.onFileDataCallbacks) {
+                cb.execute(friend, filenumber, data);
+            }
+        }
+    }
+
+    /**
+     * Add the specified callback
+     *
+     * @param callback
+     *            callback to add
+     */
+    public void registerOnFileDataCallback(OnFileDataCallback<F> callback) {
+        this.onFileDataCallbacks.add(callback);
+    }
+
+    /**
+     * Remove the specified callback
+     *
+     * @param callback
+     *            callback to remove
+     */
+    public void unregisterOnFileDataCallback(OnFileDataCallback<F> callback) {
+        this.onFileDataCallbacks.remove(callback);
+    }
+
+    /**
+     * Remove all callbacks
+     */
+    public void clearOnFileDataCallbacks() {
+        this.onFileDataCallbacks.clear();
+    }
+
+    /**
+     * Add all specified callbacks
+     *
+     * @param callbacks
+     *            callbacks to add
+     */
+    public <T extends OnFileDataCallback<F>> void registerOnFileDataCallbacks(List<T> callbacks) {
+        for (T callback : callbacks) {
+            registerOnFileDataCallback(callback);
+        }
+    }
+
+    /**
+     * Set the specified callbacks. This removes all previously set callbacks
+     *
+     * @param callbacks
+     *            callbacks to set
+     */
+    public <T extends OnFileDataCallback<F>> void setOnFileDataCallbacks(List<T> callbacks) {
+        clearOnFileDataCallbacks();
+        registerOnFileDataCallbacks(callbacks);
+    }
+    /**
+     * Hook for native API to invoke callback methods
+     *
+     * @param friendnumber
+     *            the friend who sent the message
+     * @param message
+     *            the message
+     */
+    @SuppressWarnings("unused")
+    private void onFileSendRequest(int friendnumber, int filenumber, long filesize, byte[] filename) {
+        F friend = this.friendlist.getByFriendNumber(friendnumber);
+
+        synchronized (this.onMessageCallbacks) {
+            for (OnFileSendRequestCallback<F> cb : this.onFileSendRequestCallbacks) {
+                cb.execute(friend, filenumber, filesize, filename);
+            }
+        }
+    }
+
+    /**
+     * Add the specified callback
+     *
+     * @param callback
+     *            callback to add
+     */
+    public void registerOnFileSendRequestCallback(OnFileSendRequestCallback<F> callback) {
+        this.onFileSendRequestCallbacks.add(callback);
+    }
+
+    /**
+     * Remove the specified callback
+     *
+     * @param callback
+     *            callback to remove
+     */
+    public void unregisterOnFileSendRequestCallback(OnFileSendRequestCallback<F> callback) {
+        this.onFileSendRequestCallbacks.remove(callback);
+    }
+
+    /**
+     * Remove all callbacks
+     */
+    public void clearOnFileSendRequestCallbacks() {
+        this.onFileSendRequestCallbacks.clear();
+    }
+
+    /**
+     * Add all specified callbacks
+     *
+     * @param callbacks
+     *            callbacks to add
+     */
+    public <T extends OnFileSendRequestCallback<F>> void registerOnFileSendRequestCallbacks(List<T> callbacks) {
+        for (T callback : callbacks) {
+            registerOnFileSendRequestCallback(callback);
+        }
+    }
+
+    /**
+     * Set the specified callbacks. This removes all previously set callbacks
+     *
+     * @param callbacks
+     *            callbacks to set
+     */
+    public <T extends OnFileSendRequestCallback<F>> void setOnFileSendRequestCallbacks(List<T> callbacks) {
+        clearOnFileSendRequestCallbacks();
+        registerOnFileSendRequestCallbacks(callbacks);
+    }
 	/**
 	 * Hook for native API to invoke callback methods
 	 *

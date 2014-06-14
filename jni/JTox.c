@@ -100,6 +100,12 @@ JNIEXPORT jlong JNICALL Java_im_tox_jtoxcore_JTox_tox_1new(JNIEnv *env, jobject 
 
 	tox_callback_typing_change(globals->tox, callback_typingstatus, globals);
 
+	tox_callback_file_control(globals->tox, callback_filecontrol, globals);
+
+	tox_callback_file_send_request(globals->tox, callback_filesendrequest, globals);
+
+	tox_callback_file_data(globals->tox, callback_filedata, globals);
+
 	return ((jlong) ((intptr_t) globals));
 }
 
@@ -367,6 +373,95 @@ JNIEXPORT jbyteArray JNICALL Java_im_tox_jtoxcore_JTox_tox_1get_1name(JNIEnv *en
 	}
 }
 
+/*
+JNIEXPORT jobjectArray JNICALL Java_im_tox_jtoxcore_JTox_tox_lgroup_lget_lnames(JNIEnv *env,
+        jobject obj, jlong messenger, jint groupnumber)
+{
+    int num_peers = tox_group_number_peers(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, groupnumber);
+    jbyte **names;
+    names = (jbyte **) malloc(num_peers*sizeof(jbyte*));
+    int i;
+    for (i = 0; i < num_peers; i++) {
+        names[i] = (jbyte*) malloc(TOX_MAX_NAME_LENGTH*sizeof(jbyte));
+    }
+    jshort *lengths = malloc(num_peers*sizeof(jshort));
+    jshort length;
+    int ret = tox_group_get_names(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, groupnumber, (uint8_t [][TOX_MAX_NAME_LENGTH]) names, lengths, length);
+    if (ret == -1) {
+        return NULL;
+    } else {
+        // The 2D array to return
+        jbyte** primitive2DArray = names;
+
+        // Get the array class
+        jclass byteArrayClass = (*env)->FindClass(env, "[B");
+
+        // Check if we properly got the array class
+        if (byteArrayClass == NULL) {
+            return NULL;
+        }
+
+        // Create the returnable 2D array
+        jobjectArray returnable2DArray = (*env)->NewObjectArray(env, (jsize) num_peers, byteArrayClass, NULL);
+
+        // Go through the first dimension and add the second dimension arrays
+        for (i = 0; i < num_peers; i++) {
+            jbyteArray byteArray = (*env)->NewByteArray(env, TOX_MAX_NAME_LENGTH);
+            (*env)->SetByteArrayRegion(env, byteArray, (jsize) 0, (jsize) TOX_MAX_NAME_LENGTH, (jbyte*) primitive2DArray[i]);
+            (*env)->SetObjectArrayElement(env, returnable2DArray, (jsize) i, byteArray);
+            (*env)->DeleteLocalRef(env, byteArray);
+        }
+        // Return a Java consumable 2D long array
+        return returnable2DArray;
+    }
+}
+*/
+
+// FILE SENDING BEGINS
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lnew_lfile_lsender(JNIEnv *env, jobject obj, jlong messenger, jint friendnumber, jlong filesize, jbyteArray filename, jint length)
+{
+	jbyte *_filename = (*env)->GetByteArrayElements(env, filename, 0);
+    int result = tox_new_file_sender(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, friendnumber, filesize, (uint8_t *) _filename, length);
+	(*env)->ReleaseByteArrayElements(env, filename, _filename, JNI_ABORT);
+	UNUSED(obj);
+    return result;
+}
+
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lfile_lsend_lcontrol(JNIEnv *env, jobject obj, jlong messenger, jint friendnumber, jint send_receive, jint filenumber, jint message_id, jbyteArray data, jint length)
+{
+	jbyte *_data = (*env)->GetByteArrayElements(env, data, 0);
+    int result = tox_file_send_control(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, friendnumber, send_receive, filenumber, message_id, (uint8_t *) _data, length);
+	(*env)->ReleaseByteArrayElements(env, data, _data, JNI_ABORT);
+	UNUSED(obj);
+    return result;
+}
+
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lfile_lsend_ldata(JNIEnv *env, jobject obj, jlong messenger, jint friendnumber, jint filenumber, jbyteArray data, jint length)
+{
+	jbyte *_data = (*env)->GetByteArrayElements(env, data, 0);
+    int result = tox_file_send_data(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, friendnumber, filenumber, (uint8_t *) _data, length);
+	(*env)->ReleaseByteArrayElements(env, data, _data, JNI_ABORT);
+	UNUSED(obj);
+    return result;
+}
+
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lfile_ldata_lsize(JNIEnv *env, jobject obj, jlong messenger, jint friendnumber)
+{
+    int result = tox_file_data_size(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, friendnumber);
+	UNUSED(obj);
+	UNUSED(env);
+    return result;
+}
+
+JNIEXPORT jlong JNICALL Java_im_tox_jtoxcore_JTox_tox_lfile_ldata_lremaining(JNIEnv *env, jobject obj, jlong messenger, jint friendnumber, jint filenumber, jint send_receive)
+{
+    long result = tox_file_data_remaining(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, friendnumber, filenumber, send_receive);
+	UNUSED(obj);
+	UNUSED(env);
+    return result;
+}
+// FILE SENDING ENDS
+
 JNIEXPORT jboolean JNICALL Java_im_tox_jtoxcore_JTox_tox_1set_1user_1status(JNIEnv *env, jobject obj, jlong messenger,
 		jint userstatus)
 {
@@ -542,6 +637,62 @@ JNIEXPORT jboolean JNICALL Java_im_tox_jtoxcore_JTox_tox_1get_1is_1typing
 /**
  * Begin Callback Section
  */
+static void callback_filecontrol(Tox *tox, int32_t friendnumber, uint8_t receive_send, uint8_t filenumber, uint8_t control_type, uint8_t *data, uint16_t length, void *rptr)
+{
+    tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
+    JNIEnv *env;
+    jclass clazz;
+    jmethodID meth;
+    jbyteArray _data;
+
+    ATTACH_THREAD(ptr, env);
+	clazz = (*env)->GetObjectClass(env, ptr->handler);
+	meth = (*env)->GetMethodID(env, clazz, "onFileControl", "(IIII[B)V");
+
+    _data = (*env)->NewByteArray(env, length);
+	(*env)->SetByteArrayRegion(env, _data, 0, length, (jbyte *) data);
+
+    (*env)->CallVoidMethod(env, ptr->handler, meth, friendnumber, receive_send, filenumber, control_type, _data);
+    UNUSED(tox);
+}
+
+static void callback_filedata(Tox *tox, int32_t friendnumber, uint8_t filenumber, uint8_t *data, uint16_t length, void *rptr)
+{
+    tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
+    JNIEnv *env;
+    jclass clazz;
+    jmethodID meth;
+    jbyteArray _data;
+
+    ATTACH_THREAD(ptr, env);
+	clazz = (*env)->GetObjectClass(env, ptr->handler);
+	meth = (*env)->GetMethodID(env, clazz, "onFileData", "(II[B)V");
+
+    _data = (*env)->NewByteArray(env, length);
+	(*env)->SetByteArrayRegion(env, _data, 0, length, (jbyte *) data);
+
+    (*env)->CallVoidMethod(env, ptr->handler, meth, friendnumber, filenumber, _data);
+    UNUSED(tox);
+}
+
+static void callback_filesendrequest(Tox *tox, int32_t friendnumber, uint8_t filenumber, uint64_t filesize, uint8_t *filename, uint16_t length, void *rptr)
+{
+    tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
+    JNIEnv *env;
+    jclass clazz;
+    jmethodID meth;
+    jbyteArray _filename;
+
+    ATTACH_THREAD(ptr, env);
+	clazz = (*env)->GetObjectClass(env, ptr->handler);
+	meth = (*env)->GetMethodID(env, clazz, "onFileSendRequest", "(IIJ[B)V");
+
+    _filename = (*env)->NewByteArray(env, length);
+	(*env)->SetByteArrayRegion(env, _filename, 0, length, (jbyte *) filename);
+
+    (*env)->CallVoidMethod(env, ptr->handler, meth, friendnumber, filenumber, filesize, _filename);
+    UNUSED(tox);
+}
 
 static void callback_friendrequest(Tox *tox, uint8_t *pubkey, uint8_t *message, uint16_t length, void *rptr)
 {
