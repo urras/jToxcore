@@ -1344,10 +1344,10 @@ public class JTox<F extends ToxFriend> {
 
 	/****** GROUP CHAT FUNCTIONS END ******/
 	/****** FILE SENDING FUNCTIONS BEGIN ******/
-	private native int tox_new_file_sender(long messengerPointer, int friendnumber, long filesize, byte[] filename,
+	private native int tox_new_file_sender(long messengerPointer, int friendnumber, double filesize, byte[] filename,
 										   int length);
 
-	public int toxNewFileSender(int friendnumber, long filesize, String filename) throws ToxException {
+	public int toxNewFileSender(int friendnumber, double filesize, String filename) throws ToxException {
 		int result;
 		byte[] _filename = filename.getBytes(Charset.forName("UTF-8"));
 		this.lock.lock();

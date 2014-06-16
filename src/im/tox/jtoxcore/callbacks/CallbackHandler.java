@@ -445,7 +445,7 @@ public class CallbackHandler<F extends ToxFriend> {
 	 *            the message
 	 */
 	@SuppressWarnings("unused")
-	private void onFileSendRequest(int friendnumber, int filenumber, long filesize, byte[] filename) {
+	private void onFileSendRequest(int friendnumber, int filenumber, double filesize, byte[] filename) {
 		F friend = this.friendlist.getByFriendNumber(friendnumber);
 
 		synchronized (this.onMessageCallbacks) {
