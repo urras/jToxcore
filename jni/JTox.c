@@ -418,7 +418,7 @@ JNIEXPORT jobjectArray JNICALL Java_im_tox_jtoxcore_JTox_tox_lgroup_lget_lnames(
 */
 
 // FILE SENDING BEGINS
-JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lnew_lfile_lsender(JNIEnv *env, jobject obj, jlong messenger,
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_1new_1file_1sender(JNIEnv *env, jobject obj, jlong messenger,
 		jint friendnumber, jlong filesize, jbyteArray filename, jint length)
 {
 	jbyte *_filename = (*env)->GetByteArrayElements(env, filename, 0);
@@ -429,7 +429,7 @@ JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lnew_lfile_lsender(JNIEnv *
 	return result;
 }
 
-JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lfile_lsend_lcontrol(JNIEnv *env, jobject obj, jlong messenger,
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_1file_1send_1control(JNIEnv *env, jobject obj, jlong messenger,
 		jint friendnumber, jint send_receive, jint filenumber, jint message_id, jbyteArray data, jint length)
 {
 	jbyte *_data = (*env)->GetByteArrayElements(env, data, 0);
@@ -440,7 +440,7 @@ JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lfile_lsend_lcontrol(JNIEnv
 	return result;
 }
 
-JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lfile_lsend_ldata(JNIEnv *env, jobject obj, jlong messenger,
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_1file_1send_1data(JNIEnv *env, jobject obj, jlong messenger,
 		jint friendnumber, jint filenumber, jbyteArray data, jint length)
 {
 	jbyte *_data = (*env)->GetByteArrayElements(env, data, 0);
@@ -451,7 +451,7 @@ JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lfile_lsend_ldata(JNIEnv *e
 	return result;
 }
 
-JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lfile_ldata_lsize(JNIEnv *env, jobject obj, jlong messenger,
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_1file_1data_1size(JNIEnv *env, jobject obj, jlong messenger,
 		jint friendnumber)
 {
 	int result = tox_file_data_size(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, friendnumber);
@@ -460,7 +460,7 @@ JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lfile_ldata_lsize(JNIEnv *e
 	return result;
 }
 
-JNIEXPORT jlong JNICALL Java_im_tox_jtoxcore_JTox_tox_lfile_ldata_lremaining(JNIEnv *env, jobject obj, jlong messenger,
+JNIEXPORT jlong JNICALL Java_im_tox_jtoxcore_JTox_tox_1file_1data_1remaining(JNIEnv *env, jobject obj, jlong messenger,
 		jint friendnumber, jint filenumber, jint send_receive)
 {
 	long result = tox_file_data_remaining(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, friendnumber, filenumber,
