@@ -419,7 +419,7 @@ JNIEXPORT jobjectArray JNICALL Java_im_tox_jtoxcore_JTox_tox_lgroup_lget_lnames(
 
 // FILE SENDING BEGINS
 JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_lnew_lfile_lsender(JNIEnv *env, jobject obj, jlong messenger,
-		jint friendnumber, jdouble filesize, jbyteArray filename, jint length)
+		jint friendnumber, jlong filesize, jbyteArray filename, jint length)
 {
 	jbyte *_filename = (*env)->GetByteArrayElements(env, filename, 0);
 	int result = tox_new_file_sender(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, friendnumber, filesize,

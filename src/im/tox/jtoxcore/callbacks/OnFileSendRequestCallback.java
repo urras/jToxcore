@@ -25,5 +25,5 @@ import im.tox.jtoxcore.ToxFriend;
 
 public interface OnFileSendRequestCallback<F extends ToxFriend> {
 
-	void execute(F friend, int filenumber, double filesize, byte[] filename);
+	void execute(F friend, int filenumber, long filesize, byte[] filename);
 }
