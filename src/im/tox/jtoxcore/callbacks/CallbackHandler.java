@@ -302,7 +302,7 @@ public class CallbackHandler<F extends ToxFriend> {
 	 *            the message
 	 */
 	@SuppressWarnings("unused")
-	private void onFileControl(int friendnumber, int receive_send, int friend_number, ToxFileControl control_type, byte[] data) {
+	private void onFileControl(int friendnumber, int receive_send, int file_number, ToxFileControl control_type, byte[] data) {
 		F friend = this.friendlist.getByFriendNumber(friendnumber);
 		boolean sending;
 
@@ -314,7 +314,7 @@ public class CallbackHandler<F extends ToxFriend> {
 
 		synchronized (this.onMessageCallbacks) {
 			for (OnFileControlCallback<F> cb : this.onFileControlCallbacks) {
-				cb.execute(friend, sending, friend_number, control_type, data);
+				cb.execute(friend, sending, file_number, control_type, data);
 			}
 		}
 	}
