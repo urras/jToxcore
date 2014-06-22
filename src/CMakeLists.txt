@@ -19,6 +19,7 @@ set(CLEANFILES
     "${CLASSDIR}/im/tox/jtoxcore/FriendExistsException.class"
     "${CLASSDIR}/im/tox/jtoxcore/FriendList.class"
     "${CLASSDIR}/im/tox/jtoxcore/ToxFriend.class"
+    "${CLASSDIR}/im/tox/jtoxcore/ToxFileControl.class"
     "${CLASSDIR}/im/tox/jtoxcore/callbacks/OnActionCallback.class"
     "${CLASSDIR}/im/tox/jtoxcore/callbacks/OnConnectionStatusCallback.class"
     "${CLASSDIR}/im/tox/jtoxcore/callbacks/OnMessageCallback.class"
@@ -27,12 +28,16 @@ set(CLEANFILES
     "${CLASSDIR}/im/tox/jtoxcore/callbacks/OnReadReceiptCallback.class"
     "${CLASSDIR}/im/tox/jtoxcore/callbacks/OnStatusMessageCallback.class"
     "${CLASSDIR}/im/tox/jtoxcore/callbacks/OnUserStatusCallback.class"
+    "${CLASSDIR}/im/tox/jtoxcore/callbacks/OnFileControlCallback.class"
+    "${CLASSDIR}/im/tox/jtoxcore/callbacks/OnFileDataCallback.class"
+    "${CLASSDIR}/im/tox/jtoxcore/callbacks/OnFileSendRequestCallback.class"
+    "${CLASSDIR}/im/tox/jtoxcore/callbacks/OnTypingChangeCallback.class"
     "${CLASSDIR}/im/tox/jtoxcore/callbacks/CallbackHandler.class"
     "${JNI_HEADER_LOCATION}/${JNI_HEADER_NAME}"
 )
 set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${CLEANFILES}")
 
-# Core source files 
+# Core source files
 set(JTOX_CORE
     im/tox/jtoxcore/JTox.java
     im/tox/jtoxcore/ToxError.java
@@ -42,6 +47,7 @@ set(JTOX_CORE
     im/tox/jtoxcore/FriendExistsException.java
     im/tox/jtoxcore/FriendList.java
     im/tox/jtoxcore/ToxFriend.java
+    im/tox/jtoxcore/ToxFileControl.java
 )
 
 # Callback source files
@@ -54,6 +60,10 @@ set(JTOX_CALLBACKS
     im/tox/jtoxcore/callbacks/OnReadReceiptCallback.java
     im/tox/jtoxcore/callbacks/OnStatusMessageCallback.java
     im/tox/jtoxcore/callbacks/OnUserStatusCallback.java
+    im/tox/jtoxcore/callbacks/OnFileControlCallback.java
+    im/tox/jtoxcore/callbacks/OnFileDataCallback.java
+    im/tox/jtoxcore/callbacks/OnFileSendRequestCallback.java
+    im/tox/jtoxcore/callbacks/OnTypingChangeCallback.java
     im/tox/jtoxcore/callbacks/CallbackHandler.java
 )
 
@@ -65,7 +75,7 @@ set(CMAKE_JAVA_TARGET_VERSION ${JTOXCORE_VERSION})
 add_jar(${JAR_TARGET_NAME} ${JTOX_SOURCE})
 
 # Set arguments for javah command
-set(JAVAH_ARGS 
+set(JAVAH_ARGS
     "-classpath"
     "${CLASSDIR}"
     "-o"
