@@ -1343,11 +1343,35 @@ public class JTox<F extends ToxFriend> {
 	*/
 
 	/****** GROUP CHAT FUNCTIONS END ******/
+    private native int tox_get_nospam(long messengerPointer);
+    public int getNospam() throws ToxException {
+        int result;
+        this.lock.lock();
+        try {
+            checkPointer();
+            result = tox_get_nospam(this.messengerPointer);
+        } finally {
+            this.lock.unlock();
+        }
+        return result;
+    }
+
+    private native void tox_set_nospam(long messengerPointer, int nospam);
+    public void setNospam(int nospam) throws ToxException {
+        this.lock.lock();
+        try {
+            checkPointer();
+            tox_set_nospam(this.messengerPointer, nospam);
+        } finally {
+            this.lock.unlock();
+        }
+    }
+
 	/****** FILE SENDING FUNCTIONS BEGIN ******/
 	private native int tox_new_file_sender(long messengerPointer, int friendnumber, long filesize, byte[] filename,
 										   int length);
 
-	public int toxNewFileSender(int friendnumber, long filesize, String filename) throws ToxException {
+	public int newFileSender(int friendnumber, long filesize, String filename) throws ToxException {
 		int result;
 		byte[] _filename = filename.getBytes(Charset.forName("UTF-8"));
 		this.lock.lock();
@@ -1365,7 +1389,7 @@ public class JTox<F extends ToxFriend> {
 	private native int tox_file_send_control(long messengerPointer, int friendnumber, int send_receive, int filenumber,
 			int message_id, byte[] data, int length);
 
-	public int toxFileSendControl(int friendnumber, boolean sending, int filenumber, int message_id,
+	public int fileSendControl(int friendnumber, boolean sending, int filenumber, int message_id,
 								  byte[] data) throws ToxException {
 		int result;
 		int send_receive;
@@ -1391,7 +1415,7 @@ public class JTox<F extends ToxFriend> {
 
 	private native int tox_file_send_data(long messengerPointer, int friendnumber, int filenumber, byte[] data, int length);
 
-	public int toxFileSendData(int friendnumber, int filenumber, byte[] data) throws ToxException {
+	public int fileSendData(int friendnumber, int filenumber, byte[] data) throws ToxException {
 		int result;
 		this.lock.lock();
 
@@ -1407,7 +1431,7 @@ public class JTox<F extends ToxFriend> {
 
 	private native int tox_file_data_size(long messengerPointer, int friendnumber);
 
-	public int toxFileDataSize(int friendnumber) throws ToxException {
+	public int fileDataSize(int friendnumber) throws ToxException {
 		int result;
 		this.lock.lock();
 
@@ -1423,7 +1447,7 @@ public class JTox<F extends ToxFriend> {
 
 	private native long tox_file_data_remaining(long messengerPointer, int friendnumber, int filenumber, int send_receive);
 
-	public long toxFileDataRemaining(int friendnumber, int filenumber, boolean sending) throws ToxException {
+	public long fileDataRemaining(int friendnumber, int filenumber, boolean sending) throws ToxException {
 		long result;
 		int send_receive;
 
