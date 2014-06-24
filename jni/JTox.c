@@ -710,11 +710,13 @@ static void callback_filedata(Tox *tox, int32_t friendnumber, uint8_t filenumber
 	ATTACH_THREAD(ptr, env);
 	clazz = (*env)->GetObjectClass(env, ptr->handler);
 	meth = (*env)->GetMethodID(env, clazz, "onFileData", "(II[B)V");
+	(*env)->DeleteLocalRef(env, clazz);
 
 	_data = (*env)->NewByteArray(env, length);
 	(*env)->SetByteArrayRegion(env, _data, 0, length, (jbyte *) data);
 
 	(*env)->CallVoidMethod(env, ptr->handler, meth, friendnumber, filenumber, _data);
+	(*env)->DeleteLocalRef(env, _data);
 	UNUSED(tox);
 }
 
