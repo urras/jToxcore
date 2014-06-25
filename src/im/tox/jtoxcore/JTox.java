@@ -758,6 +758,21 @@ public class JTox<F extends ToxFriend> {
 		}
 	}
 
+    private native int tox_do_interval(long messengerPointer);
+
+    public int doToxInterval() throws ToxException {
+        this.lock.lock();
+        int result = -1;
+
+        try {
+            checkPointer();
+
+            result = tox_do_interval(this.messengerPointer);
+        } finally {
+            this.lock.unlock();
+        }
+        return result;
+    }
 	/**
 	 * Native call to tox_bootstrap_from_address
 	 *
