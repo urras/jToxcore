@@ -760,6 +760,12 @@ public class JTox<F extends ToxFriend> {
 
     private native int tox_do_interval(long messengerPointer);
 
+    /**
+     * Return the time in milliseconds before doTox() should be called again
+     * for optimal performance.
+     * @return time in ms, -1 on failure
+     * @throws ToxException
+     */
     public int doToxInterval() throws ToxException {
         this.lock.lock();
         int result = -1;
