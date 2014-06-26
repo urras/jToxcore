@@ -1343,7 +1343,14 @@ public class JTox<F extends ToxFriend> {
 	*/
 
 	/****** GROUP CHAT FUNCTIONS END ******/
+
     private native int tox_get_nospam(long messengerPointer);
+
+    /**
+     * Get your nospam
+     * @return nospam
+     * @throws ToxException
+     */
     public int getNospam() throws ToxException {
         int result;
         this.lock.lock();
@@ -1357,6 +1364,12 @@ public class JTox<F extends ToxFriend> {
     }
 
     private native void tox_set_nospam(long messengerPointer, int nospam);
+
+    /**
+     * Set your no spam
+     * @param nospam
+     * @throws ToxException
+     */
     public void setNospam(int nospam) throws ToxException {
         this.lock.lock();
         try {
