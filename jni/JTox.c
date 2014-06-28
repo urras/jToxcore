@@ -134,6 +134,14 @@ JNIEXPORT void JNICALL Java_im_tox_jtoxcore_JTox_tox_1do(JNIEnv *env, jobject ob
 	UNUSED(obj);
 }
 
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_1do_1interval(JNIEnv *env, jobject obj, jlong messenger)
+{
+	jint result = tox_do_interval(((tox_jni_globals_t *) ((intptr_t) messenger))->tox);
+	UNUSED(env);
+	UNUSED(obj);
+	return result;
+}
+
 JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_1isconnected(JNIEnv *env, jobject obj, jlong messenger)
 {
 	UNUSED(env);
