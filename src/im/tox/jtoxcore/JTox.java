@@ -1364,11 +1364,57 @@ public class JTox<F extends ToxFriend> {
 	*/
 
 	/****** GROUP CHAT FUNCTIONS END ******/
+
+    private native int tox_get_nospam(long messengerPointer);
+
+    /**
+     * Get your nospam
+     * @return nospam
+     * @throws ToxException
+     */
+    public int getNospam() throws ToxException {
+        int result;
+        this.lock.lock();
+        try {
+            checkPointer();
+            result = tox_get_nospam(this.messengerPointer);
+        } finally {
+            this.lock.unlock();
+        }
+        return result;
+    }
+
+    private native void tox_set_nospam(long messengerPointer, int nospam);
+
+    /**
+     * Set your no spam
+     * @param nospam
+     * @throws ToxException
+     */
+    public void setNospam(int nospam) throws ToxException {
+        this.lock.lock();
+        try {
+            checkPointer();
+            tox_set_nospam(this.messengerPointer, nospam);
+        } finally {
+            this.lock.unlock();
+        }
+    }
+
 	/****** FILE SENDING FUNCTIONS BEGIN ******/
 	private native int tox_new_file_sender(long messengerPointer, int friendnumber, long filesize, byte[] filename,
 										   int length);
 
-	public int toxNewFileSender(int friendnumber, long filesize, String filename) throws ToxException {
+    /**
+     * Send a file send request.
+     * Maximum filename length is 255 bytes
+     * @param friendnumber
+     * @param filesize
+     * @param filename
+     * @return filenumber on success, -1 on failure
+     * @throws ToxException
+     */
+	public int newFileSender(int friendnumber, long filesize, String filename) throws ToxException {
 		int result;
 		byte[] _filename = filename.getBytes(Charset.forName("UTF-8"));
 		this.lock.lock();
@@ -1386,7 +1432,19 @@ public class JTox<F extends ToxFriend> {
 	private native int tox_file_send_control(long messengerPointer, int friendnumber, int send_receive, int filenumber,
 			int message_id, byte[] data, int length);
 
-	public int toxFileSendControl(int friendnumber, boolean sending, int filenumber, int message_id,
+    /**
+     * Send a file control request.
+     * sending is true if we want the control packet to target a file we are currently sending,
+     * false if it targets a file we are currently receiving.
+     * @param friendnumber
+     * @param sending
+     * @param filenumber
+     * @param message_id
+     * @param data
+     * @return 0 on success, -1 on failure
+     * @throws ToxException
+     */
+	public int fileSendControl(int friendnumber, boolean sending, int filenumber, int message_id,
 								  byte[] data) throws ToxException {
 		int result;
 		int send_receive;
@@ -1412,7 +1470,15 @@ public class JTox<F extends ToxFriend> {
 
 	private native int tox_file_send_data(long messengerPointer, int friendnumber, int filenumber, byte[] data, int length);
 
-	public int toxFileSendData(int friendnumber, int filenumber, byte[] data) throws ToxException {
+    /**
+     * Send file data
+     * @param friendnumber
+     * @param filenumber
+     * @param data
+     * @return 0 on success, -1 on failure
+     * @throws ToxException
+     */
+	public int fileSendData(int friendnumber, int filenumber, byte[] data) throws ToxException {
 		int result;
 		this.lock.lock();
 
@@ -1428,7 +1494,13 @@ public class JTox<F extends ToxFriend> {
 
 	private native int tox_file_data_size(long messengerPointer, int friendnumber);
 
-	public int toxFileDataSize(int friendnumber) throws ToxException {
+    /**
+     * Give the number of bytes left to be sent/received.
+     * @param friendnumber
+     * @return size in bytes on success, -1 on failure
+     * @throws ToxException
+     */
+	public int fileDataSize(int friendnumber) throws ToxException {
 		int result;
 		this.lock.lock();
 
@@ -1444,7 +1516,16 @@ public class JTox<F extends ToxFriend> {
 
 	private native long tox_file_data_remaining(long messengerPointer, int friendnumber, int filenumber, int send_receive);
 
-	public long toxFileDataRemaining(int friendnumber, int filenumber, boolean sending) throws ToxException {
+    /**
+     * Give the number of bytes left to be sent/received.
+     * sending is true if we want a file we are sending, false if we want one we are receiving
+     * @param friendnumber
+     * @param filenumber
+     * @param sending
+     * @return number of bytes left on success, 0 on failure
+     * @throws ToxException
+     */
+	public long fileDataRemaining(int friendnumber, int filenumber, boolean sending) throws ToxException {
 		long result;
 		int send_receive;
 

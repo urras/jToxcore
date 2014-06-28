@@ -425,6 +425,19 @@ JNIEXPORT jobjectArray JNICALL Java_im_tox_jtoxcore_JTox_tox_lgroup_lget_lnames(
 }
 */
 
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_1get_1nospam(JNIEnv *env, jobject obj, jlong messenger)
+{
+    int result = tox_get_nospam(((tox_jni_globals_t *) ((intptr_t) messenger))->tox);
+    UNUSED(obj);
+    UNUSED(env);
+    return result;
+}
+JNIEXPORT void JNICALL Java_im_tox_jtoxcore_JTox_tox_1set_1nospam(JNIEnv *env, jobject obj, jlong messenger, jint nospam)
+{
+    tox_set_nospam(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, nospam);
+    UNUSED(obj);
+    UNUSED(env);
+}
 // FILE SENDING BEGINS
 JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_1new_1file_1sender(JNIEnv *env, jobject obj, jlong messenger,
 		jint friendnumber, jlong filesize, jbyteArray filename, jint length)
