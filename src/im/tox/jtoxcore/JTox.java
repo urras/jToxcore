@@ -1674,4 +1674,248 @@ public class JTox<F extends ToxFriend> {
 
 		return out;
 	}
+    ///////////////////////AUDIO / VIDEO///////////////////////////////////////////////
+    /**
+	 * Native call to toxav_new
+     * Start new a/v session, There can only be one session at the time. If you register more
+     * it will result in undefined behaviour.
+	 *
+     * @param messenger pointer
+     * @param max number of calls
+	 * @return the pointer to the av session struct on success, null on failure
+	 */
+	private native long toxav_new(long messengerPointer, int max_calls);
+
+    /**
+    * @brief Remove A/V session.
+    *
+    * @param av Handler.
+    * @return void
+    */
+    private native void toxav_kill(long avPointer);
+
+    /**
+    * @brief Register callback for call state.
+    *
+    * @param av Handler.
+    * @param callback The callback
+    * @param id One of the ToxAvCallbackID values
+    * @return void
+    *
+    private native void toxav_register_callstate_callback (long avPointer, ToxAVCallback callback, ToxAvCallbackID id, void *userdata);
+
+    /**
+    * @brief Register callback for recieving audio data
+    *
+    * @param av Handler.
+    * @param callback The callback
+    * @return void
+    *
+    private native void toxav_register_audio_recv_callback (ToxAv *av, void (*callback)(ToxAv *, int32_t, int16_t *, int));
+
+    /**
+    * @brief Register callback for recieving video data
+    *
+    * @param av Handler.
+    * @param callback The callback
+    * @return void
+    *
+    private native void toxav_register_video_recv_callback (ToxAv *av, void (*callback)(ToxAv *, int32_t, vpx_image_t *));
+
+    /**
+    * @brief Call user. Use its friend_id.
+    *
+    * @param av Handler.
+    * @param call_index Call index
+    * @param user The user.
+    * @param csettings Codec settings
+    * @param ringing_seconds Ringing timeout.
+    * @return int
+    * @retval 0 Success.
+    * @retval ToxAvError On error.
+    */
+    private native int toxav_call(long avPointer, int user, ToxCodecSettings csettings, int ringing_seconds);
+
+    /**
+    * @brief Hangup active call.
+    *
+    * @param av Handler.
+    * @return int
+    * @retval 0 Success.
+    * @retval ToxAvError On error.
+    */
+    private native int toxav_hangup(long avPointer, int call_index);
+
+    /**
+    * @brief Answer incomming call.
+    *
+    * @param av Handler.
+    * @param call_type Answer with...
+    * @return int
+    * @retval 0 Success.
+    * @retval ToxAvError On error.
+    */
+    private native int toxav_answer(long avPointer, int call_index, ToxCodecSettings csettings );
+
+    /**
+    * @brief Reject incomming call.
+    *
+    * @param av Handler.
+    * @param reason Optional reason. Set NULL if none.
+    * @return int
+    * @retval 0 Success.
+    * @retval ToxAvError On error.
+    */
+    private native int toxav_reject(long avPointer, int call_index, String reason);
+
+    /**
+    * @brief Cancel outgoing request.
+    *
+    * @param av Handler.
+    * @param reason Optional reason.
+    * @param peer_id peer friend_id
+    * @return int
+    * @retval 0 Success.
+    * @retval ToxAvError On error.
+    */
+    private native int toxav_cancel(long avPointer, int call_index, int peer_id, String reason);
+
+    /**
+    * @brief Notify peer that we are changing call settings
+    *
+    * @param av Handler.
+    * @return int
+    * @retval 0 Success.
+    * @retval ToxAvError On error.
+    */
+    private native int toxav_change_settings(long avPointer, int call_index, ToxCodecSettings csettings);
+
+    /**
+    * @brief Terminate transmission. Note that transmission will be terminated without informing remote peer.
+    *
+    * @param av Handler.
+    * @return int
+    * @retval 0 Success.
+    * @retval ToxAvError On error.
+    */
+    private native int toxav_stop_call(long avPointer, int call_index);
+
+    /**
+    * @brief Must be call before any RTP transmission occurs.
+    *
+    * @param av Handler.
+    * @param support_video Is video supported ? 1 : 0
+    * @return int
+    * @retval 0 Success.
+    * @retval ToxAvError On error.
+    */
+    private native int toxav_prepare_transmission(long avPointer, int call_index, int jbuf_size, int VAD_treshold,
+                                   int support_video);
+
+    /**
+    * @brief Call this at the end of the transmission.
+    *
+    * @param av Handler.
+    * @return int
+    * @retval 0 Success.
+    * @retval ToxAvError On error.
+    */
+    private native int toxav_kill_transmission(long avPointer, int call_index);
+
+    /**
+    * @brief Encode and send video packet.
+    *
+    * @param av Handler.
+    * @param frame The encoded frame.
+    * @param frame_size The size of the encoded frame.
+    * @return int
+    * @retval 0 Success.
+    * @retval ToxAvError On error.
+    */
+    private native int toxav_send_video (long avPointer, int call_index, byte[] frame, int frame_size);
+
+    /**
+    * @brief Send audio frame.
+    *
+    * @param av Handler.
+    * @param frame The frame (raw 16 bit signed pcm with AUDIO_CHANNELS channels audio.)
+    * @param frame_size Its size in number of frames/samples (one frame/sample is 16 bits or 2 bytes)
+    * frame size should be AUDIO_FRAME_SIZE.
+    * @return int
+    * @retval 0 Success.
+    * @retval ToxAvError On error.
+    */
+    private native int toxav_send_audio (long avPointer, int call_index, byte[] frame, int frame_size);
+
+    /**
+    * @brief Encode video frame
+    *
+    * @param av Handler
+    * @param dest Where to
+    * @param dest_max Max size
+    * @param input What to encode
+    * @return int
+    * @retval ToxAvError On error.
+    * @retval >0 On success
+    */
+    private native byte[] toxav_prepare_video_frame (long avPointer, int call_index, int dest_max, byte[] data, int width, int height);
+
+    /**
+    * @brief Encode audio frame
+    *
+    * @param av Handler
+    * @param dest dest
+    * @param dest_max Max dest size
+    * @param frame The frame
+    * @param frame_size The frame size
+    * @return int
+    * @retval ToxAvError On error.
+    * @retval >0 On success
+    */
+    private native byte[] toxav_prepare_audio_frame (long avPointer, int call_index, int dest_max, int[] frame, int frame_size);
+
+    /**
+    * @brief Get peer transmission type. It can either be audio or video.
+    *
+    * @param av Handler.
+    * @param peer The peer
+    * @return int
+    * @retval ToxAvCallType On success.
+    * @retval ToxAvError On error.
+    */
+    private native ToxCodecSettings toxav_get_peer_csettings (long avPointer, int call_index, int peer);
+
+    /**
+    * @brief Get id of peer participating in conversation
+    *
+    * @param av Handler
+    * @param peer peer index
+    * @return int
+    * @retval ToxAvError No peer id
+    */
+    private native int toxav_get_peer_id (long avPointer, int call_index, int peer );
+
+    /**
+    * @brief Get current call state
+    *
+    * @param av Handler
+    * @param call_index What call
+    * @return int
+    * @retval ToxAvCallState State id
+    */
+    private native ToxAvCallState toxav_get_call_state (long avPointer, int call_index );
+    /**
+    * @brief Is certain capability supported
+    *
+    * @param av Handler
+    * @return int
+    * @retval 1 Yes.
+    * @retval 0 No.
+    */
+    private native int toxav_capability_supported (long avPointer, int call_index, ToxAvCapabilities capability );
+
+
+    private native long toxav_get_tox(long avPointer);
+
+    private native int toxav_has_activity (long avPointer, int call_index, int[] PCM, int frame_size, float ref_energy );
 }
