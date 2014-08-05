@@ -5,5 +5,5 @@ import im.tox.jtoxcore.ToxAvCallbackID;
 
 public interface OnAvCallbackCallback<F extends ToxFriend> {
 
-    void execute(int callId, ToxAvCallbackID callbackId);
+	void execute(int callId, ToxAvCallbackID callbackId);
 }

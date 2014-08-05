@@ -32,10 +32,10 @@ import im.tox.jtoxcore.ToxFriend;
  */
 public interface OnTypingChangeCallback<F extends ToxFriend> {
 
-    /**
-     * Method to be executed each time a Friend starts or stops typing
-     * @param friend the Friend
-     * @param typing <code>true</code> if the friend started typing, <code>false</code> otherwise
-     */
-    void execute(F friend, boolean typing);
+	/**
+	 * Method to be executed each time a Friend starts or stops typing
+	 * @param friend the Friend
+	 * @param typing <code>true</code> if the friend started typing, <code>false</code> otherwise
+	 */
+	void execute(F friend, boolean typing);
 }

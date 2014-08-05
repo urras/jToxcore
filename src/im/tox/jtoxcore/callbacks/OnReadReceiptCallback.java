@@ -32,15 +32,15 @@ import im.tox.jtoxcore.ToxFriend;
  */
 public interface OnReadReceiptCallback<F extends ToxFriend> {
 
-    /**
-     * Method to be executed each time a read receipt is received
-     *
-     * @param friend
-     *            the friend who sent the receipt
-     * @param receipt
-     *            number of the receipt. This is one of the numbers returned
-     *            when sending messages, so you will need to keep track of those
-     *            in order to use this functionality.
-     */
-    void execute(F friend, int receipt);
+	/**
+	 * Method to be executed each time a read receipt is received
+	 *
+	 * @param friend
+	 *            the friend who sent the receipt
+	 * @param receipt
+	 *            number of the receipt. This is one of the numbers returned
+	 *            when sending messages, so you will need to keep track of those
+	 *            in order to use this functionality.
+	 */
+	void execute(F friend, int receipt);
 }

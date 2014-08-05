@@ -22,6 +22,6 @@
 package im.tox.jtoxcore;
 
 public enum ToxCallType {
-    TYPE_AUDIO,
-    TYPE_VIDEO
+	TYPE_AUDIO,
+	TYPE_VIDEO
 }

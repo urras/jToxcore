@@ -31,74 +31,74 @@ package im.tox.jtoxcore;
  */
 public interface ToxFriend {
 
-    /**
-     * @return the id
-     */
-    String getId();
+	/**
+	 * @return the id
+	 */
+	String getId();
 
-    /**
-     * @return the name
-     */
-    String getName();
+	/**
+	 * @return the name
+	 */
+	String getName();
 
-    /**
-     * @return the statusMessage
-     */
-    String getStatusMessage();
+	/**
+	 * @return the statusMessage
+	 */
+	String getStatusMessage();
 
-    /**
-     * @return the status
-     */
-    ToxUserStatus getStatus();
+	/**
+	 * @return the status
+	 */
+	ToxUserStatus getStatus();
 
-    /**
-     * @return the online
-     */
-    boolean isOnline();
+	/**
+	 * @return the online
+	 */
+	boolean isOnline();
 
-    /**
-     * @return the friendnumber
-     */
-    int getFriendnumber();
+	/**
+	 * @return the friendnumber
+	 */
+	int getFriendnumber();
 
-    /**
-     * @return whether the Friend is typing
-     */
-    boolean isTyping();
+	/**
+	 * @return whether the Friend is typing
+	 */
+	boolean isTyping();
 
-    /**
-     * @param id
-     *            the id to set
-     */
-    void setId(String id);
+	/**
+	 * @param id
+	 *            the id to set
+	 */
+	void setId(String id);
 
-    /**
-     * @param name
-     *            the name to set
-     */
-    void setName(String name);
+	/**
+	 * @param name
+	 *            the name to set
+	 */
+	void setName(String name);
 
-    /**
-     * @param statusMessage
-     *            the statusMessage to set
-     */
-    void setStatusMessage(String statusMessage);
+	/**
+	 * @param statusMessage
+	 *            the statusMessage to set
+	 */
+	void setStatusMessage(String statusMessage);
 
-    /**
-     * @param status
-     *            the status to set
-     */
-    void setStatus(ToxUserStatus status);
+	/**
+	 * @param status
+	 *            the status to set
+	 */
+	void setStatus(ToxUserStatus status);
 
-    /**
-     * @param online
-     *            set whether Friend is online
-     */
-    void setOnline(boolean online);
+	/**
+	 * @param online
+	 *            set whether Friend is online
+	 */
+	void setOnline(boolean online);
 
-    /**
-     *
-     * @param typing set whether the Friend is typing
-     */
-    void setTyping(boolean typing);
+	/**
+	 *
+	 * @param typing set whether the Friend is typing
+	 */
+	void setTyping(boolean typing);
 }

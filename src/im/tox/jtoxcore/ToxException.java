@@ -29,69 +29,69 @@ package im.tox.jtoxcore;
  *
  */
 public class ToxException extends Exception {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private ToxError error;
+	private ToxError error;
 
-    /**
-     * Create a new ToxException with the given error code
-     *
-     * @param error
-     *            the error code to create the new Exception with
-     */
-    public ToxException(ToxError error) {
-        super();
-        this.error = error;
-    }
+	/**
+	 * Create a new ToxException with the given error code
+	 *
+	 * @param error
+	 *            the error code to create the new Exception with
+	 */
+	public ToxException(ToxError error) {
+		super();
+		this.error = error;
+	}
 
-    /**
-     * Create a new ToxException with an error code as int
-     *
-     * @param errcode
-     *            the error code, as an integer
-     */
-    public ToxException(int errcode) {
-        super();
+	/**
+	 * Create a new ToxException with an error code as int
+	 *
+	 * @param errcode
+	 *            the error code, as an integer
+	 */
+	public ToxException(int errcode) {
+		super();
 
-        switch (errcode) {
-        case -1 :
-            this.error = ToxError.TOX_TOOLONG;
-            break;
+		switch (errcode) {
+			case -1 :
+				this.error = ToxError.TOX_TOOLONG;
+				break;
 
-        case -2 :
-            this.error = ToxError.TOX_FAERR_NOMESSAGE;
-            break;
+			case -2 :
+				this.error = ToxError.TOX_FAERR_NOMESSAGE;
+				break;
 
-        case -3 :
-            this.error = ToxError.TOX_FAERR_OWNKEY;
-            break;
+			case -3 :
+				this.error = ToxError.TOX_FAERR_OWNKEY;
+				break;
 
-        case -4 :
-            this.error = ToxError.TOX_FAERR_ALREADYSENT;
-            break;
+			case -4 :
+				this.error = ToxError.TOX_FAERR_ALREADYSENT;
+				break;
 
-        case -6 :
-            this.error = ToxError.TOX_FAERR_BADCHECKSUM;
-            break;
+			case -6 :
+				this.error = ToxError.TOX_FAERR_BADCHECKSUM;
+				break;
 
-        case -7 :
-            this.error = ToxError.TOX_FAERR_SETNEWNOSPAM;
-            break;
+			case -7 :
+				this.error = ToxError.TOX_FAERR_SETNEWNOSPAM;
+				break;
 
-        case -8 :
-            this.error = ToxError.TOX_FAERR_NOMEM;
-            break;
+			case -8 :
+				this.error = ToxError.TOX_FAERR_NOMEM;
+				break;
 
-        default :
-            this.error = ToxError.TOX_UNKNOWN;
-            break;
-        }
-    }
+			default :
+				this.error = ToxError.TOX_UNKNOWN;
+				break;
+		}
+	}
 
-    /**
-     * @return The error code for this Exception
-     */
-    public ToxError getError() {
-        return this.error;
-    }
+	/**
+	 * @return The error code for this Exception
+	 */
+	public ToxError getError() {
+		return this.error;
+	}
 }

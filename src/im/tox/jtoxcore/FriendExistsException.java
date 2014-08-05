@@ -27,39 +27,39 @@ package im.tox.jtoxcore;
  * @author sonOfRa
  */
 public class FriendExistsException extends Exception {
-    private static final long serialVersionUID = 1L;
-    private int friendnumber;
+	private static final long serialVersionUID = 1L;
+	private int friendnumber;
 
-    /**
-     * Create a new FriendExistsException with the specified friendnumber and no
-     * message
-     *
-     * @param friendnumber
-     *            the friendnumber
-     */
-    public FriendExistsException(int friendnumber) {
-        super();
-        this.friendnumber = friendnumber;
-    }
+	/**
+	 * Create a new FriendExistsException with the specified friendnumber and no
+	 * message
+	 *
+	 * @param friendnumber
+	 *            the friendnumber
+	 */
+	public FriendExistsException(int friendnumber) {
+		super();
+		this.friendnumber = friendnumber;
+	}
 
-    /**
-     * Create a new FriendExistsException with the specified friendnumber and
-     * detail message
-     *
-     * @param friendnumber
-     *            the friendnumber
-     * @param message
-     *            the message
-     */
-    public FriendExistsException(int friendnumber, String message) {
-        super(message);
-        this.friendnumber = friendnumber;
-    }
+	/**
+	 * Create a new FriendExistsException with the specified friendnumber and
+	 * detail message
+	 *
+	 * @param friendnumber
+	 *            the friendnumber
+	 * @param message
+	 *            the message
+	 */
+	public FriendExistsException(int friendnumber, String message) {
+		super(message);
+		this.friendnumber = friendnumber;
+	}
 
-    /**
-     * @return the friendnumber
-     */
-    public int getFriendnumber() {
-        return this.friendnumber;
-    }
+	/**
+	 * @return the friendnumber
+	 */
+	public int getFriendnumber() {
+		return this.friendnumber;
+	}
 }

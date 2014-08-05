@@ -22,29 +22,29 @@
 package im.tox.jtoxcore;
 
 public class ToxCodecSettings {
-    public ToxCallType call_type;
+	public ToxCallType call_type;
 
-    public int video_bitrate;/* In kbits/s */
-    public int max_video_width; /* In px */
-    public int max_video_height; /* In px */
+	public int video_bitrate;/* In kbits/s */
+	public int max_video_width; /* In px */
+	public int max_video_height; /* In px */
 
-    public int audio_bitrate; /* In bits/s */
-    public int audio_frame_duration; /* In ms */
-    public int audio_sample_rate; /* In Hz */
-    public int audio_channels;
+	public int audio_bitrate; /* In bits/s */
+	public int audio_frame_duration; /* In ms */
+	public int audio_sample_rate; /* In Hz */
+	public int audio_channels;
 
-    public ToxCodecSettings() {
-        super();
-    }
-    public ToxCodecSettings(ToxCallType c, int vb, int mvw, int mvh, int ab, int afd, int asr, int ac) {
-        super();
-        this.call_type = c;
-        this.video_bitrate = vb;
-        this.max_video_width = mvw;
-        this.max_video_height = mvh;
-        this.audio_bitrate = ab;
-        this.audio_frame_duration = afd;
-        this.audio_sample_rate = asr;
-        this.audio_channels = ac;
-    }
+	public ToxCodecSettings() {
+		super();
+	}
+	public ToxCodecSettings(ToxCallType c, int vb, int mvw, int mvh, int ab, int afd, int asr, int ac) {
+		super();
+		this.call_type = c;
+		this.video_bitrate = vb;
+		this.max_video_width = mvw;
+		this.max_video_height = mvh;
+		this.audio_bitrate = ab;
+		this.audio_frame_duration = afd;
+		this.audio_sample_rate = asr;
+		this.audio_channels = ac;
+	}
 }

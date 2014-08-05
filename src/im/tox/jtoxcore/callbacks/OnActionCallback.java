@@ -32,13 +32,13 @@ import im.tox.jtoxcore.ToxFriend;
  */
 public interface OnActionCallback<F extends ToxFriend> {
 
-    /**
-     * Method to be executed each time an action is received
-     *
-     * @param friend
-     *            the friend who sent the action
-     * @param action
-     *            content of the action
-     */
-    void execute(F friend, String action);
+	/**
+	 * Method to be executed each time an action is received
+	 *
+	 * @param friend
+	 *            the friend who sent the action
+	 * @param action
+	 *            content of the action
+	 */
+	void execute(F friend, String action);
 }

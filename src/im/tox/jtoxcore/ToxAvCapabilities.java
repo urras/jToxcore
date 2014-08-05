@@ -22,8 +22,8 @@
 package im.tox.jtoxcore;
 
 public enum ToxAvCapabilities {
-    AUDIO_ENCODING,
-    AUDIO_DECODING,
-    VIDEO_ENCODING,
-    VIDEO_DECODING
+	AUDIO_ENCODING,
+	AUDIO_DECODING,
+	VIDEO_ENCODING,
+	VIDEO_DECODING
 }
