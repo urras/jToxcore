@@ -9,7 +9,16 @@
 #endif
 #include <tox/tox.h>
 #include <tox/toxav.h>
-#include "callbacks.h"
+#include <jni.h>
+#include "types.h"
+
+#ifdef ANDROID
+#define ATTACH_THREAD(ptr,env) (*ptr->jvm)->AttachCurrentThread(ptr->jvm, &env, 0)
+#else
+#define ATTACH_THREAD(ptr,env) (*ptr->jvm)->AttachCurrentThread(ptr->jvm, (void **) &env, 0)
+#endif
+#define ALIGN(x, y) y*((x + (y-1))/y)
+
 ToxAvCSettings codec_settings_to_native(JNIEnv *env, jobject codec_settings)
 {
   jclass clazz;
@@ -48,7 +57,7 @@ ToxAvCSettings codec_settings_to_native(JNIEnv *env, jobject codec_settings)
   audio_channels_id = (*env)->GetFieldID(env, clazz, "audio_channels", "Lim/tox/jtoxcore/ToxCodecSettings");
 
   //Get calltype java enum from call settings class
-  *call_type_obj = (*env)->GetObjectField(env, codec_settings, call_type_id);
+  call_type_obj = (*env)->GetObjectField(env, codec_settings, call_type_id);
   //Get remaining class members
   video_bitrate = (*env)->GetObjectField(env, codec_settings, video_bitrate_id);
   max_video_width = (*env)->GetObjectField(env, codec_settings, max_video_width_id);
@@ -86,10 +95,7 @@ jobject codec_settings_to_java(JNIEnv *env, ToxAvCSettings codec_settings_native
   jclass enum_class;
   jfieldID enum_field_id;
   jobject *call_type;
-  jmethodID get_name_method;
   jmethodID init_method;
-  jstring enum_name;
-
 
   //Turn calltype c enum into java enum
   enum_class = (*env)->FindClass(env, "im/tox/jtoxcore/ToxCallType");
@@ -103,17 +109,16 @@ jobject codec_settings_to_java(JNIEnv *env, ToxAvCSettings codec_settings_native
   //Get java class for struct, and create java object
   clazz = (*env)->FindClass(env, "im/tox/jtoxcore/ToxCodecSettings");
   init_method = (*env)->GetMethodID(env, clazz, "<init>", "(Lim/tox/jtoxcore/ToxCallType;IIIIIII)V");
-  jvalue args[8];
-  args[0] = call_type;
-  args[1] = codec_settings_native.video_bitrate;
-  args[2] = codec_settings_native.max_video_width;
-  args[3] = codec_settings_native.max_video_height;
-  args[4] = codec_settings_native.audio_bitrate;
-  args[5] = codec_settings_native.audio_frame_duration;
-  args[6] = codec_settings_native.audio_sample_rate;
-  args[7] = codec_settings_native.audio_channels;
-
-  jobject codec_settings = (*env)->NewObjectA(env, clazz, init_method, args);
+  jobject codec_settings = (*env)->NewObject(env, clazz, init_method 
+      , *call_type
+      , (jint) codec_settings_native.video_bitrate
+      , (jint) codec_settings_native.max_video_width
+      , (jint) codec_settings_native.max_video_height
+      , (jint) codec_settings_native.audio_bitrate
+      , (jint) codec_settings_native.audio_frame_duration
+      , (jint) codec_settings_native.audio_sample_rate
+      , (jint) codec_settings_native.audio_channels
+      );
   return codec_settings;
 }
 
@@ -121,6 +126,8 @@ void avcallback_helper(int32_t call_id, void *user_data, char *enum_name)
 {
   tox_av_jni_globals_t *globals = (tox_av_jni_globals_t *) user_data;
   JNIEnv *env;
+  jclass enum_class;
+  jfieldID enum_field_id;
   jclass handlerclass;
   jmethodID handlermeth;
   jobject callback_id;
@@ -129,7 +136,7 @@ void avcallback_helper(int32_t call_id, void *user_data, char *enum_name)
 
   //create java callback id enum
   enum_class = (*env)->FindClass(env, "im/tox/jtoxcore/ToxAvCallbackID");
-  enum_field_id = (*env)->GetStaticFieldID(env, enum_class, *enum_name, "Lim/tox/jtoxcore/ToxCallbackID");
+  enum_field_id = (*env)->GetStaticFieldID(env, enum_class, enum_name, "Lim/tox/jtoxcore/ToxCallbackID");
   callback_id = (*env)->GetStaticObjectField(env, enum_class, enum_field_id);
 
   //call java methods

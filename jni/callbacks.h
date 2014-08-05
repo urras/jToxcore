@@ -18,20 +18,6 @@
  *  along with jToxcore.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-typedef struct {
-	Tox *tox;
-	JavaVM *jvm;
-	jobject handler;
-	jobject jtox;
-} tox_jni_globals_t;
-
-typedef struct {
-	ToxAv *toxav;
-	JavaVM *jvm;
-	jobject handler;
-	jobject jtox;
-} tox_av_jni_globals_t;
-
 static void callback_friendrequest(Tox *, uint8_t *, uint8_t *, uint16_t, void *);
 static void callback_friendmessage(Tox *, int, uint8_t *, uint16_t, void *);
 static void callback_action(Tox *, int32_t, uint8_t *, uint16_t, void *);
