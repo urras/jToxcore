@@ -32,14 +32,14 @@ import im.tox.jtoxcore.ToxFriend;
  */
 public interface OnConnectionStatusCallback<F extends ToxFriend> {
 
-	/**
-	 * Method to be executed each time a connection status is received
-	 *
-	 * @param friend
-	 *            the friend who's status changed
-	 * @param online
-	 *            true if the friend is online after being previously offline,
-	 *            false otherwise
-	 */
-	void execute(F friend, boolean online);
+    /**
+     * Method to be executed each time a connection status is received
+     *
+     * @param friend
+     *            the friend who's status changed
+     * @param online
+     *            true if the friend is online after being previously offline,
+     *            false otherwise
+     */
+    void execute(F friend, boolean online);
 }

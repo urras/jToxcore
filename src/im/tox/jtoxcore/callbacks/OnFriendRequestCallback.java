@@ -28,14 +28,14 @@ package im.tox.jtoxcore.callbacks;
  */
 public interface OnFriendRequestCallback {
 
-	/**
-	 * Method to be executed each time a friend request is received
-	 *
-	 * @param publicKey
-	 *            the friend's public key
-	 * @param message
-	 *            an optional message sent with the friend request. Might be
-	 *            <code>null</code>, so you need to check for this
-	 */
-	void execute(String publicKey, String message);
+    /**
+     * Method to be executed each time a friend request is received
+     *
+     * @param publicKey
+     *            the friend's public key
+     * @param message
+     *            an optional message sent with the friend request. Might be
+     *            <code>null</code>, so you need to check for this
+     */
+    void execute(String publicKey, String message);
 }

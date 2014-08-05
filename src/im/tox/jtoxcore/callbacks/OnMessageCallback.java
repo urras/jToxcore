@@ -31,13 +31,13 @@ import im.tox.jtoxcore.ToxFriend;
  */
 public interface OnMessageCallback<F extends ToxFriend> {
 
-	/**
-	 * Method to be executed each time a message is received
-	 *
-	 * @param friend
-	 *            the friend who sent the message
-	 * @param message
-	 *            the message
-	 */
-	void execute(F friend, String message);
+    /**
+     * Method to be executed each time a message is received
+     *
+     * @param friend
+     *            the friend who sent the message
+     * @param message
+     *            the message
+     */
+    void execute(F friend, String message);
 }

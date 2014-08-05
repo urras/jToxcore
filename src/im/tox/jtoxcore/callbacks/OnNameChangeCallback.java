@@ -31,13 +31,13 @@ import im.tox.jtoxcore.ToxFriend;
  */
 public interface OnNameChangeCallback<F extends ToxFriend> {
 
-	/**
-	 * Method to be executed each time a name change is received from a friend
-	 *
-	 * @param friend
-	 *            the friend
-	 * @param newname
-	 *            the new name
-	 */
-	void execute(F friend, String newname);
+    /**
+     * Method to be executed each time a name change is received from a friend
+     *
+     * @param friend
+     *            the friend
+     * @param newname
+     *            the new name
+     */
+    void execute(F friend, String newname);
 }

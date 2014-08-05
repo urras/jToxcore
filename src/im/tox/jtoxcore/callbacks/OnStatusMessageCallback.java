@@ -31,13 +31,13 @@ import im.tox.jtoxcore.ToxFriend;
  */
 public interface OnStatusMessageCallback<F extends ToxFriend> {
 
-	/**
-	 * Method to be executed each time a friend changes their status message
-	 *
-	 * @param friend
-	 *            the friend who changed their status
-	 * @param newstatus
-	 *            the new status message
-	 */
-	void execute(F friend, String newstatus);
+    /**
+     * Method to be executed each time a friend changes their status message
+     *
+     * @param friend
+     *            the friend who changed their status
+     * @param newstatus
+     *            the new status message
+     */
+    void execute(F friend, String newstatus);
 }
