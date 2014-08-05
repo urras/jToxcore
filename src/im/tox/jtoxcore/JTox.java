@@ -78,6 +78,7 @@ public class JTox<F extends ToxFriend> {
 	 */
 	private final long messengerPointer;
 
+    private final long avPointer;
 	/**
 	 * Native call to tox_new
 	 *
@@ -106,8 +107,16 @@ public class JTox<F extends ToxFriend> {
 		}
 
 		this.messengerPointer = pointer;
+        long avPointer = toxav_new(this.messengerPointer, 16);
+
+        if (avPointer == 0) {
+            throw new ToxException(ToxError.TOX_UNKNOWN);
+        }
+
+        this.avPointer = avPointer;
 		this.lock = new ReentrantLock();
 		validPointers.add(pointer);
+        validPointers.add(avPointer);
 		instanceLock.lock();
 
 		try {
@@ -1620,6 +1629,11 @@ public class JTox<F extends ToxFriend> {
 		}
 	}
 
+    private void checkAvPointer() throws ToxException {
+        if (!validPointers.contains(this.avPointer)) {
+            throw new ToxException(ToxError.TOX_KILLED_INSTANCE);
+        }
+    }
 	/**
 	 * If you need to pass a JTox instance around between different contexts,
 	 * and are unable to pass instances directly, use this method to acquire the
@@ -1716,34 +1730,6 @@ public class JTox<F extends ToxFriend> {
     private native void toxav_kill(long avPointer);
 
     /**
-    * @brief Register callback for call state.
-    *
-    * @param av Handler.
-    * @param callback The callback
-    * @param id One of the ToxAvCallbackID values
-    * @return void
-    *
-    private native void toxav_register_callstate_callback (long avPointer, ToxAVCallback callback, ToxAvCallbackID id, void *userdata);
-
-    /**
-    * @brief Register callback for recieving audio data
-    *
-    * @param av Handler.
-    * @param callback The callback
-    * @return void
-    *
-    private native void toxav_register_audio_recv_callback (ToxAv *av, void (*callback)(ToxAv *, int32_t, int16_t *, int));
-
-    /**
-    * @brief Register callback for recieving video data
-    *
-    * @param av Handler.
-    * @param callback The callback
-    * @return void
-    *
-    private native void toxav_register_video_recv_callback (ToxAv *av, void (*callback)(ToxAv *, int32_t, vpx_image_t *));
-
-    /**
     * @brief Call user. Use its friend_id.
     *
     * @param av Handler.
@@ -1757,6 +1743,19 @@ public class JTox<F extends ToxFriend> {
     */
     private native int toxav_call(long avPointer, int user, ToxCodecSettings csettings, int ringing_seconds);
 
+    public int avCall(int user, ToxCodecSettings csettings, int ringingSeconds) throws ToxException {
+        this.lock.lock();
+        int ret;
+
+        try {
+            checkPointer();
+            ret = toxav_call(this.avPointer, user, csettings, ringingSeconds);
+        } finally {
+            this.lock.unlock();
+        }
+        return ret;
+    }
+
     /**
     * @brief Hangup active call.
     *
@@ -1766,6 +1765,18 @@ public class JTox<F extends ToxFriend> {
     * @retval ToxAvError On error.
     */
     private native int toxav_hangup(long avPointer, int call_index);
+    public int avHangup(int callIndex) throws ToxException {
+        this.lock.lock();
+        int ret;
+
+        try {
+            checkPointer();
+            ret = toxav_hangup(this.avPointer, callIndex);
+        } finally {
+            this.lock.unlock();
+        }
+        return ret;
+    }
 
     /**
     * @brief Answer incomming call.
@@ -1777,6 +1788,18 @@ public class JTox<F extends ToxFriend> {
     * @retval ToxAvError On error.
     */
     private native int toxav_answer(long avPointer, int call_index, ToxCodecSettings csettings );
+    public int avAnswer(int callIndex, ToxCodecSettings csettings) throws ToxException {
+        this.lock.lock();
+        int ret;
+
+        try {
+            checkPointer();
+            ret = toxav_answer(this.avPointer, callIndex, csettings);
+        } finally {
+            this.lock.unlock();
+        }
+        return ret;
+    }
 
     /**
     * @brief Reject incomming call.
@@ -1788,6 +1811,18 @@ public class JTox<F extends ToxFriend> {
     * @retval ToxAvError On error.
     */
     private native int toxav_reject(long avPointer, int call_index, String reason);
+    public int avReject(int callIndex, String reason) throws ToxException {
+        this.lock.lock();
+        int ret;
+
+        try {
+            checkPointer();
+            ret = toxav_reject(this.avPointer, callIndex, reason);
+        } finally {
+            this.lock.unlock();
+        }
+        return ret;
+    }
 
     /**
     * @brief Cancel outgoing request.
@@ -1800,6 +1835,18 @@ public class JTox<F extends ToxFriend> {
     * @retval ToxAvError On error.
     */
     private native int toxav_cancel(long avPointer, int call_index, int peer_id, String reason);
+    public int avCancel(int callIndex, int peerId, String reason) throws ToxException {
+        this.lock.lock();
+        int ret;
+
+        try {
+            checkPointer();
+            ret = toxav_cancel(this.avPointer, callIndex, peerId, reason);
+        } finally {
+            this.lock.unlock();
+        }
+        return ret;
+    }
 
     /**
     * @brief Notify peer that we are changing call settings
@@ -1810,6 +1857,18 @@ public class JTox<F extends ToxFriend> {
     * @retval ToxAvError On error.
     */
     private native int toxav_change_settings(long avPointer, int call_index, ToxCodecSettings csettings);
+    public int avChangeSettings(int callIndex, ToxCodecSettings csettings) throws ToxException {
+        this.lock.lock();
+        int ret;
+
+        try {
+            checkPointer();
+            ret = toxav_change_settings(this.avPointer, callIndex, csettings);
+        } finally {
+            this.lock.unlock();
+        }
+        return ret;
+    }
 
     /**
     * @brief Terminate transmission. Note that transmission will be terminated without informing remote peer.
@@ -1820,6 +1879,18 @@ public class JTox<F extends ToxFriend> {
     * @retval ToxAvError On error.
     */
     private native int toxav_stop_call(long avPointer, int call_index);
+    public int avStopCall(int callIndex) throws ToxException {
+        this.lock.lock();
+        int ret;
+
+        try {
+            checkPointer();
+            ret = toxav_stop_call(this.avPointer, callIndex);
+        } finally {
+            this.lock.unlock();
+        }
+        return ret;
+    }
 
     /**
     * @brief Must be call before any RTP transmission occurs.
@@ -1832,6 +1903,24 @@ public class JTox<F extends ToxFriend> {
     */
     private native int toxav_prepare_transmission(long avPointer, int call_index, int jbuf_size, int VAD_treshold,
                                    int support_video);
+    public int avPrepareTransmission(int callIndex, int jBufSize, int VADThreshold, boolean supportVideo) throws ToxException {
+        this.lock.lock();
+        int ret;
+        int s;
+        if (supportVideo) {
+            s = 1;
+        } else {
+            s = 0;
+        }
+
+        try {
+            checkPointer();
+            ret = toxav_prepare_transmission(this.avPointer, callIndex, jBufSize, VADThreshold, s);
+        } finally {
+            this.lock.unlock();
+        }
+        return ret;
+    }
 
     /**
     * @brief Call this at the end of the transmission.
@@ -1842,6 +1931,18 @@ public class JTox<F extends ToxFriend> {
     * @retval ToxAvError On error.
     */
     private native int toxav_kill_transmission(long avPointer, int call_index);
+    public int avKillTransmission(int callIndex) throws ToxException {
+        this.lock.lock();
+        int ret;
+
+        try {
+            checkPointer();
+            ret = toxav_kill_transmission(this.avPointer, callIndex);
+        } finally {
+            this.lock.unlock();
+        }
+        return ret;
+    }
 
     /**
     * @brief Encode and send video packet.
@@ -1854,6 +1955,18 @@ public class JTox<F extends ToxFriend> {
     * @retval ToxAvError On error.
     */
     private native int toxav_send_video (long avPointer, int call_index, byte[] frame, int frame_size);
+    public int avSendVideo(int callIndex, byte[] frame) throws ToxException {
+        this.lock.lock();
+        int ret;
+
+        try {
+            checkPointer();
+            ret = toxav_send_video(this.avPointer, callIndex, frame, frame.length);
+        } finally {
+            this.lock.unlock();
+        }
+        return ret;
+    }
 
     /**
     * @brief Send audio frame.
@@ -1867,6 +1980,18 @@ public class JTox<F extends ToxFriend> {
     * @retval ToxAvError On error.
     */
     private native int toxav_send_audio (long avPointer, int call_index, byte[] frame, int frame_size);
+    public int avSendAudio(int callIndex, byte[] frame) throws ToxException {
+        this.lock.lock();
+        int ret;
+
+        try {
+            checkPointer();
+            ret = toxav_send_audio(this.avPointer, callIndex, frame, frame.length);
+        } finally {
+            this.lock.unlock();
+        }
+        return ret;
+    }
 
     /**
     * @brief Encode video frame
@@ -1880,6 +2005,18 @@ public class JTox<F extends ToxFriend> {
     * @retval >0 On success
     */
     private native byte[] toxav_prepare_video_frame (long avPointer, int call_index, int dest_max, byte[] data, int width, int height);
+    public byte[] avPrepareVideoFrame(int callIndex, int destMax, byte[] data, int width, int height) throws ToxException {
+        this.lock.lock();
+        byte[] ret;
+
+        try {
+            checkPointer();
+            ret = toxav_prepare_video_frame(this.avPointer, callIndex, destMax, data, width, height);
+        } finally {
+            this.lock.unlock();
+        }
+        return ret;
+    }
 
     /**
     * @brief Encode audio frame
@@ -1894,6 +2031,18 @@ public class JTox<F extends ToxFriend> {
     * @retval >0 On success
     */
     private native byte[] toxav_prepare_audio_frame (long avPointer, int call_index, int dest_max, int[] frame, int frame_size);
+    public byte[] avPrepareAudioFrame(int callIndex, int destMax, int[] data, int frameSize) throws ToxException {
+        this.lock.lock();
+        byte[] ret;
+
+        try {
+            checkPointer();
+            ret = toxav_prepare_audio_frame(this.avPointer, callIndex, destMax, data, frameSize);
+        } finally {
+            this.lock.unlock();
+        }
+        return ret;
+    }
 
     /**
     * @brief Get peer transmission type. It can either be audio or video.
@@ -1905,6 +2054,18 @@ public class JTox<F extends ToxFriend> {
     * @retval ToxAvError On error.
     */
     private native ToxCodecSettings toxav_get_peer_csettings (long avPointer, int call_index, int peer);
+    public ToxCodecSettings avGetPeerCodecSettings(int callIndex, int peer) throws ToxException {
+        this.lock.lock();
+        ToxCodecSettings ret;
+
+        try {
+            checkPointer();
+            ret = toxav_get_peer_csettings(this.avPointer, callIndex, peer);
+        } finally {
+            this.lock.unlock();
+        }
+        return ret;
+    }
 
     /**
     * @brief Get id of peer participating in conversation
@@ -1915,6 +2076,18 @@ public class JTox<F extends ToxFriend> {
     * @retval ToxAvError No peer id
     */
     private native int toxav_get_peer_id (long avPointer, int call_index, int peer );
+    public int avGetPeerId(int callIndex, int peer) throws ToxException {
+        this.lock.lock();
+        int ret;
+
+        try {
+            checkPointer();
+            ret = toxav_get_peer_id(this.avPointer, callIndex, peer);
+        } finally {
+            this.lock.unlock();
+        }
+        return ret;
+    }
 
     /**
     * @brief Get current call state
@@ -1925,6 +2098,18 @@ public class JTox<F extends ToxFriend> {
     * @retval ToxAvCallState State id
     */
     private native ToxAvCallState toxav_get_call_state (long avPointer, int call_index );
+    public ToxAvCallState avGetCallState(int callIndex) throws ToxException {
+        this.lock.lock();
+        ToxAvCallState ret;
+
+        try {
+            checkPointer();
+            ret = toxav_get_call_state(this.avPointer, callIndex);
+        } finally {
+            this.lock.unlock();
+        }
+        return ret;
+    }
     /**
     * @brief Is certain capability supported
     *
@@ -1934,9 +2119,22 @@ public class JTox<F extends ToxFriend> {
     * @retval 0 No.
     */
     private native int toxav_capability_supported (long avPointer, int call_index, ToxAvCapabilities capability );
+    public boolean avCapabilitySupported(int callIndex, ToxAvCapabilities capability) throws ToxException {
+        this.lock.lock();
+        int ret;
 
+        try {
+            checkPointer();
+            ret = toxav_capability_supported(this.avPointer, callIndex, capability);
+        } finally {
+            this.lock.unlock();
+        }
+        return ret == 1;
+    }
 
+/* not implemented
     private native long toxav_get_tox(long avPointer);
 
     private native int toxav_has_activity (long avPointer, int call_index, int[] PCM, int frame_size, float ref_energy );
+    */
 }
