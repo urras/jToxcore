@@ -43,7 +43,6 @@ endif()
 add_library(
 	${LIB_TARGET_NAME}
 	SHARED
-	types.h
 	callbacks.h
 	JTox.c
 	utils.c

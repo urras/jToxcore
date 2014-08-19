@@ -1719,31 +1719,29 @@ public class JTox<F extends ToxFriend> {
 	 * Start new a/v session, There can only be one session at the time. If you register more
 	 * it will result in undefined behaviour.
 	 *
-	 * @param messenger pointer
-	 * @param max number of calls
+	 * @param messengerPointer messenger pointer
+	 * @param max_calls max number of calls
 	 * @return the pointer to the av session struct on success, null on failure
 	 */
 	private native long toxav_new(long messengerPointer, int max_calls);
 
 	/**
-	* @brief Remove A/V session.
+	* Remove A/V session.
 	*
-	* @param av Handler.
+	* @param avPointer av handler pointer
 	* @return void
 	*/
 	private native void toxav_kill(long avPointer);
 
 	/**
-	* @brief Call user. Use its friend_id.
+	* Call user. Use its friend_id.
 	*
 	* @param av Handler.
 	* @param call_index Call index
 	* @param user The user.
 	* @param csettings Codec settings
 	* @param ringing_seconds Ringing timeout.
-	* @return int
-	* @retval 0 Success.
-	* @retval ToxAvError On error.
+	* @return int, 0 on success
 	*/
 	private native int toxav_call(long avPointer, int user, ToxCodecSettings csettings, int ringing_seconds);
 
@@ -1770,12 +1768,10 @@ public class JTox<F extends ToxFriend> {
 	}
 
 	/**
-	* @brief Hangup active call.
+	* Hangup active call.
 	*
 	* @param av Handler.
-	* @return int
-	* @retval 0 Success.
-	* @retval ToxAvError On error.
+	* @return 0 on success
 	*/
 	private native int toxav_hangup(long avPointer, int call_index);
 
@@ -1800,20 +1796,19 @@ public class JTox<F extends ToxFriend> {
 	}
 
 	/**
-	* @brief Answer incomming call.
+	* Answer incoming call.
 	*
 	* @param av Handler.
-	* @param call_type Answer with...
-	* @return int
-	* @retval 0 Success.
-	* @retval ToxAvError On error.
+	* @param call_index call index
+    * @param csettings codec settings
+	* @return 0 on success
 	*/
 	private native int toxav_answer(long avPointer, int call_index, ToxCodecSettings csettings );
 
 	/**
 	 * Answer incoming call
-	 * @param callIndex
-	 * @param csettings
+	 * @param callIndex call index
+	 * @param csettings codec settings
 	 * @return 0 on success
 	 * @throws ToxException
 	 */
@@ -1832,13 +1827,12 @@ public class JTox<F extends ToxFriend> {
 	}
 
 	/**
-	* @brief Reject incomming call.
+	* Reject incomming call.
 	*
 	* @param av Handler.
+    * @param call_index call index
 	* @param reason Optional reason. Set NULL if none.
 	* @return int
-	* @retval 0 Success.
-	* @retval ToxAvError On error.
 	*/
 	private native int toxav_reject(long avPointer, int call_index, String reason);
 
@@ -1864,25 +1858,24 @@ public class JTox<F extends ToxFriend> {
 	}
 
 	/**
-	* @brief Cancel outgoing request.
+	* Cancel outgoing request.
 	*
 	* @param av Handler.
+    * @param call_index call index
 	* @param reason Optional reason.
 	* @param peer_id peer friend_id
-	* @return int
-	* @retval 0 Success.
-	* @retval ToxAvError On error.
+	* @return 0 on success
 	*/
 	private native int toxav_cancel(long avPointer, int call_index, int peer_id, String reason);
 
 	/**
-	 * Cancel outgoing request
-	 * @param callIndex
-	 * @param peerId
-	 * @param reason
-	 * @return 0 on success
-	 * @throws ToxException
-	 */
+    * Cancel outgoing request
+    * @param callIndex
+    * @param peerId
+    * @param reason
+    * @return 0 on success
+    * @throws ToxException
+    */
 	public int avCancel(int callIndex, int peerId, String reason) throws ToxException {
 		this.lock.lock();
 		int ret;
@@ -1898,12 +1891,12 @@ public class JTox<F extends ToxFriend> {
 	}
 
 	/**
-	* @brief Notify peer that we are changing call settings
+	* Notify peer that we are changing call settings
 	*
 	* @param av Handler.
-	* @return int
-	* @retval 0 Success.
-	* @retval ToxAvError On error.
+    * @param call_index call index
+    * @param csettings codec settings
+	* @return 0 on success
 	*/
 	private native int toxav_change_settings(long avPointer, int call_index, ToxCodecSettings csettings);
 
@@ -1929,12 +1922,11 @@ public class JTox<F extends ToxFriend> {
 	}
 
 	/**
-	* @brief Terminate transmission. Note that transmission will be terminated without informing remote peer.
+	* Terminate transmission. Note that transmission will be terminated without informing remote peer.
 	*
 	* @param av Handler.
-	* @return int
-	* @retval 0 Success.
-	* @retval ToxAvError On error.
+    * @param call_index call index
+	* @return 0 on success
 	*/
 	private native int toxav_stop_call(long avPointer, int call_index);
 
@@ -1959,13 +1951,14 @@ public class JTox<F extends ToxFriend> {
 	}
 
 	/**
-	* @brief Must be call before any RTP transmission occurs.
+	* Must be call before any RTP transmission occurs.
 	*
 	* @param av Handler.
+    * @param call_index call index
+    * @param jbuf_size buffer size
+    * @param VAD_treshold VAD threshold
 	* @param support_video Is video supported ? 1 : 0
-	* @return int
-	* @retval 0 Success.
-	* @retval ToxAvError On error.
+	* @return 0 on success
 	*/
 	private native int toxav_prepare_transmission(long avPointer, int call_index, int jbuf_size,
 			int VAD_treshold, int support_video);
@@ -2001,12 +1994,11 @@ public class JTox<F extends ToxFriend> {
 	}
 
 	/**
-	* @brief Call this at the end of the transmission.
+	* Call this at the end of the transmission.
 	*
 	* @param av Handler.
-	* @return int
-	* @retval 0 Success.
-	* @retval ToxAvError On error.
+    * @param call_index call index
+	* @return 0 on success
 	*/
 	private native int toxav_kill_transmission(long avPointer, int call_index);
 
@@ -2031,14 +2023,13 @@ public class JTox<F extends ToxFriend> {
 	}
 
 	/**
-	* @brief Encode and send video packet.
+	* Encode and send video packet.
 	*
 	* @param av Handler.
+    * @param call_index call index
 	* @param frame The encoded frame.
 	* @param frame_size The size of the encoded frame.
-	* @return int
-	* @retval 0 Success.
-	* @retval ToxAvError On error.
+	* @return 0 on success
 	*/
 	private native int toxav_send_video (long avPointer, int call_index, byte[] frame, int frame_size);
 
@@ -2064,15 +2055,14 @@ public class JTox<F extends ToxFriend> {
 	}
 
 	/**
-	* @brief Send audio frame.
+	* Send audio frame.
 	*
 	* @param av Handler.
+    * @param call_index call index
 	* @param frame The frame (raw 16 bit signed pcm with AUDIO_CHANNELS channels audio.)
 	* @param frame_size Its size in number of frames/samples (one frame/sample is 16 bits or 2 bytes)
 	* frame size should be AUDIO_FRAME_SIZE.
-	* @return int
-	* @retval 0 Success.
-	* @retval ToxAvError On error.
+	* @return 0 on success
 	*/
 	private native int toxav_send_audio (long avPointer, int call_index, byte[] frame, int frame_size);
 
@@ -2098,15 +2088,15 @@ public class JTox<F extends ToxFriend> {
 	}
 
 	/**
-	* @brief Encode video frame
+	* Encode video frame
 	*
 	* @param av Handler
-	* @param dest Where to
+    * @param call_index call index
 	* @param dest_max Max size
-	* @param input What to encode
-	* @return int
-	* @retval ToxAvError On error.
-	* @retval >0 On success
+	* @param data What to encode
+    * @param width width
+    * @param height height
+	* @return byte array on success, null on fail
 	*/
 	private native byte[] toxav_prepare_video_frame (long avPointer, int call_index, int dest_max, byte[] data, int width, int height);
 
@@ -2135,16 +2125,14 @@ public class JTox<F extends ToxFriend> {
 	}
 
 	/**
-	* @brief Encode audio frame
+	* Encode audio frame
 	*
 	* @param av Handler
-	* @param dest dest
+    * @param call_index call index
 	* @param dest_max Max dest size
 	* @param frame The frame
 	* @param frame_size The frame size
-	* @return int
-	* @retval ToxAvError On error.
-	* @retval >0 On success
+	* @return byte array on success, else null
 	*/
 	private native byte[] toxav_prepare_audio_frame (long avPointer, int call_index, int dest_max, int[] frame, int frame_size);
 
@@ -2172,13 +2160,12 @@ public class JTox<F extends ToxFriend> {
 	}
 
 	/**
-	* @brief Get peer transmission type. It can either be audio or video.
+	* Get peer transmission type. It can either be audio or video.
 	*
 	* @param av Handler.
+    * @param call_index call index
 	* @param peer The peer
-	* @return int
-	* @retval ToxAvCallType On success.
-	* @retval ToxAvError On error.
+	* @return codec settings on success
 	*/
 	private native ToxCodecSettings toxav_get_peer_csettings (long avPointer, int call_index, int peer);
 
@@ -2204,12 +2191,12 @@ public class JTox<F extends ToxFriend> {
 	}
 
 	/**
-	* @brief Get id of peer participating in conversation
+	* Get id of peer participating in conversation
 	*
 	* @param av Handler
+    * @param call_index call index
 	* @param peer peer index
-	* @return int
-	* @retval ToxAvError No peer id
+	* @return peer id
 	*/
 	private native int toxav_get_peer_id (long avPointer, int call_index, int peer );
 
@@ -2235,12 +2222,11 @@ public class JTox<F extends ToxFriend> {
 	}
 
 	/**
-	* @brief Get current call state
+	* Get current call state
 	*
 	* @param av Handler
 	* @param call_index What call
-	* @return int
-	* @retval ToxAvCallState State id
+	* @return ToxAvCallState
 	*/
 	private native ToxAvCallState toxav_get_call_state (long avPointer, int call_index );
 
@@ -2264,12 +2250,11 @@ public class JTox<F extends ToxFriend> {
 		return ret;
 	}
 	/**
-	* @brief Is certain capability supported
+	* Is certain capability supported
 	*
 	* @param av Handler
-	* @return int
-	* @retval 1 Yes.
-	* @retval 0 No.
+	* @param call_index call index
+	* @return 1 yes, 0 no
 	*/
 	private native int toxav_capability_supported (long avPointer, int call_index, ToxAvCapabilities capability );
 
