@@ -77,7 +77,7 @@ JNIEXPORT jlong JNICALL Java_im_tox_jtoxcore_JTox_tox_1new(JNIEnv *env, jobject 
 	jobject handlerRef = (*env)->NewGlobalRef(env, handler);
 	jobject jtoxRef = (*env)->NewGlobalRef(env, jobj);
 	(*env)->GetJavaVM(env, &jvm);
-	globals->tox = tox_new(1);
+	globals->tox = tox_new(0);
 	globals->jvm = jvm;
 	globals->handler = handlerRef;
 	globals->jtox = jtoxRef;
@@ -115,9 +115,9 @@ JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_1bootstrap_1from_1address(J
 	const char *_ip = (*env)->GetStringUTFChars(env, ip, 0);
 	jbyte *_address = (*env)->GetByteArrayElements(env, address, 0);
 
-	uint16_t _port = htons((uint16_t) port);
+	uint16_t _port = (uint16_t) port;
 
-	jint result = tox_bootstrap_from_address(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, _ip, 1, _port,
+	jint result = tox_bootstrap_from_address(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, _ip, _port,
 				  (uint8_t *) _address);
 
 	(*env)->ReleaseStringUTFChars(env, ip, _ip);
