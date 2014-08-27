@@ -659,45 +659,6 @@ public class JTox<F extends ToxFriend> {
 	}
 
 	/**
-	 * Native call to tox_set_sends_receipts
-	 *
-	 * @param messengerPointer
-	 *            pointer to the internal messenger struct
-	 * @param sendReceipts
-	 *            <code>true</code> to send receipts, <code>false</code>
-	 *            otherwise
-	 * @param friendnumber
-	 *            the friend's number
-	 */
-	private native void tox_set_sends_receipts(long messengerPointer, boolean sendReceipts, int friendnumber);
-
-	/**
-	 * Set whether or not to send read receipts to the originator of a message
-	 * once we received a message. This defaults to <code>true</code>, and must
-	 * be disabled manually for each friend, if not required
-	 *
-	 * @param friendnumber
-	 *            the friend's number
-	 *
-	 * @param sendReceipts
-	 *            <code>true</code> to send receipts, <code>false</code>
-	 *            otherwise
-	 * @throws ToxException
-	 *             if the instance has been killed
-	 */
-	public void setSendReceipts(int friendnumber, boolean sendReceipts) throws ToxException {
-		this.lock.lock();
-
-		try {
-			checkPointer();
-
-			tox_set_sends_receipts(this.messengerPointer, sendReceipts, friendnumber);
-		} finally {
-			this.lock.unlock();
-		}
-	}
-
-	/**
 	 * Native call to tox_set_user_is_typing
 	 * @param messengerPointer pointer to the internal messenger struct
 	 * @param friendnumber the friend's number
