@@ -610,14 +610,6 @@ JNIEXPORT jobject JNICALL Java_im_tox_jtoxcore_JTox_tox_1get_1self_1user_1status
 	return (*env)->GetStaticObjectField(env, us_enum, fieldID);
 }
 
-JNIEXPORT void JNICALL Java_im_tox_jtoxcore_JTox_tox_1set_1sends_1receipts(JNIEnv *env, jobject obj, jlong messenger,
-		jboolean send, jint friendnumber)
-{
-	UNUSED(env);
-	UNUSED(obj);
-	tox_set_sends_receipts(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, friendnumber, send);
-}
-
 JNIEXPORT jintArray JNICALL Java_im_tox_jtoxcore_JTox_tox_1get_1friendlist(JNIEnv *env, jobject obj, jlong messenger)
 {
 	Tox *tox = ((tox_jni_globals_t *) ((intptr_t) messenger))->tox;
