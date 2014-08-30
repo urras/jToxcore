@@ -83,8 +83,12 @@ JNIEXPORT jlong JNICALL Java_im_tox_jtoxcore_JTox_tox_1new(JNIEnv *env, jobject 
 	jobject handlerRef = (*env)->NewGlobalRef(env, handler);
 	jobject jtoxRef = (*env)->NewGlobalRef(env, jobj);
 	(*env)->GetJavaVM(env, &jvm);
-    	tox_options_native = tox_options_to_native(env, tox_options);
+<<<<<<< HEAD
+	globals->tox = tox_new(0);
+=======
+    tox_options_native = tox_options_to_native(env, tox_options);
 	globals->tox = tox_new(&tox_options_native);
+>>>>>>> b7405eea11d026662c0c9cb45a735f9531a8a831
 	globals->jvm = jvm;
 	globals->handler = handlerRef;
 	globals->jtox = jtoxRef;
@@ -1317,7 +1321,7 @@ static void callback_typingstatus(Tox *tox, int32_t friendnumber, uint8_t is_typ
 
 	UNUSED(tox);
 }
-
+<<<<<<< HEAD
 static void avcallback_invite(void *tox_av, int32_t call_id, void *user_data)
 {
 	avcallback_helper(call_id, user_data, "ON_INVITE");
@@ -1454,6 +1458,7 @@ static void avcallback_video(ToxAv *tox_av, int32_t call_id, vpx_image_t *img, v
 	handlermeth = (*env)->GetMethodID(env, handlerclass,
 									  "onVideoData", "(I[BII)V");
 	(*env)->CallVoidMethod(env, globals->handler, handlermeth, call_id, output, img->d_w, img->d_h);
+=======
 
 Tox_Options tox_options_to_native(JNIEnv *env, jobject tox_options)
 {
@@ -1508,4 +1513,5 @@ Tox_Options tox_options_to_native(JNIEnv *env, jobject tox_options)
     (*env)->ReleaseStringUTFChars(env, proxy_address, proxy_address_native);
     tox_options_native.proxy_port = port;
     return tox_options_native;
+>>>>>>> b7405eea11d026662c0c9cb45a735f9531a8a831
 }
