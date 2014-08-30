@@ -45,6 +45,7 @@ add_library(
 	SHARED
 	callbacks.h
 	JTox.c
+	utils.c
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL Windows)

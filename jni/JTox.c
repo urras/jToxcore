@@ -28,9 +28,12 @@
 #include <arpa/inet.h>
 #endif
 #include <tox/tox.h>
+#include <tox/toxav.h>
 
 #include "JTox.h"
 #include "callbacks.h"
+#include "types.h"
+#include "utils.h"
 
 #define ADDR_SIZE_HEX (TOX_FRIEND_ADDRESS_SIZE * 2 + 1)
 #define UNUSED(x) (void)(x)
@@ -41,6 +44,7 @@
 #define ATTACH_THREAD(ptr,env) (*ptr->jvm)->AttachCurrentThread(ptr->jvm, (void **) &env, 0)
 #endif
 
+#define ALIGN(x, y) y*((x + (y-1))/y)
 /**
  * Begin Utilities section
  */
@@ -132,14 +136,6 @@ JNIEXPORT void JNICALL Java_im_tox_jtoxcore_JTox_tox_1do(JNIEnv *env, jobject ob
 	tox_do(((tox_jni_globals_t *) ((intptr_t) messenger))->tox);
 	UNUSED(env);
 	UNUSED(obj);
-}
-
-JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_1do_1interval(JNIEnv *env, jobject obj, jlong messenger)
-{
-	jint result = tox_do_interval(((tox_jni_globals_t *) ((intptr_t) messenger))->tox);
-	UNUSED(env);
-	UNUSED(obj);
-	return result;
 }
 
 JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_1isconnected(JNIEnv *env, jobject obj, jlong messenger)
@@ -427,16 +423,16 @@ JNIEXPORT jobjectArray JNICALL Java_im_tox_jtoxcore_JTox_tox_lgroup_lget_lnames(
 
 JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_1get_1nospam(JNIEnv *env, jobject obj, jlong messenger)
 {
-    int result = tox_get_nospam(((tox_jni_globals_t *) ((intptr_t) messenger))->tox);
-    UNUSED(obj);
-    UNUSED(env);
-    return result;
+	int result = tox_get_nospam(((tox_jni_globals_t *) ((intptr_t) messenger))->tox);
+	UNUSED(obj);
+	UNUSED(env);
+	return result;
 }
 JNIEXPORT void JNICALL Java_im_tox_jtoxcore_JTox_tox_1set_1nospam(JNIEnv *env, jobject obj, jlong messenger, jint nospam)
 {
-    tox_set_nospam(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, nospam);
-    UNUSED(obj);
-    UNUSED(env);
+	tox_set_nospam(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, nospam);
+	UNUSED(obj);
+	UNUSED(env);
 }
 // FILE SENDING BEGINS
 JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_1new_1file_1sender(JNIEnv *env, jobject obj, jlong messenger,
@@ -652,7 +648,350 @@ JNIEXPORT jboolean JNICALL Java_im_tox_jtoxcore_JTox_tox_1get_1is_1typing
 	UNUSED(obj);
 	return is_typing == 1 ? JNI_TRUE : JNI_FALSE;
 }
-/**
+////////////////////////////// AUDIO / VIDEO////////////////////////////////////
+
+JNIEXPORT jlong JNICALL Java_im_tox_jtoxcore_JTox_toxav_1new
+(JNIEnv *env, jobject obj, jlong messenger, jint max_calls)
+{
+	tox_av_jni_globals_t *globals = malloc(sizeof(tox_av_jni_globals_t));
+	Tox *tox = ((tox_jni_globals_t *) ((intptr_t) messenger))->tox;
+	JavaVM *jvm;
+	jclass clazz = (*env)->GetObjectClass(env, obj);
+	jfieldID id = (*env)->GetFieldID(env, clazz, "handler", "Lim/tox/jtoxcore/callbacks/CallbackHandler;");
+	jobject handler = (*env)->GetObjectField(env, obj, id);
+	jobject handlerRef = (*env)->NewGlobalRef(env, handler);
+	jobject jtoxRef = (*env)->NewGlobalRef(env, obj);
+	(*env)->GetJavaVM(env, &jvm);
+	globals->toxav = toxav_new(tox, (int32_t) max_calls);
+	globals->jvm = jvm;
+	globals->handler = handlerRef;
+	globals->jtox = jtoxRef;
+
+	toxav_register_callstate_callback(globals->toxav, avcallback_invite, av_OnInvite, globals);
+	toxav_register_callstate_callback(globals->toxav, avcallback_start, av_OnStart, globals);
+	toxav_register_callstate_callback(globals->toxav, avcallback_cancel, av_OnCancel, globals);
+	toxav_register_callstate_callback(globals->toxav, avcallback_reject, av_OnReject, globals);
+	toxav_register_callstate_callback(globals->toxav, avcallback_end, av_OnEnd, globals);
+	toxav_register_callstate_callback(globals->toxav, avcallback_ringing, av_OnRinging, globals);
+	toxav_register_callstate_callback(globals->toxav, avcallback_starting, av_OnStarting, globals);
+	toxav_register_callstate_callback(globals->toxav, avcallback_ending, av_OnInvite, globals);
+	toxav_register_callstate_callback(globals->toxav, avcallback_requesttimeout, av_OnRequestTimeout, globals);
+	toxav_register_callstate_callback(globals->toxav, avcallback_peertimeout, av_OnPeerTimeout, globals);
+	toxav_register_callstate_callback(globals->toxav, avcallback_mediachange, av_OnMediaChange, globals);
+	toxav_register_audio_recv_callback(globals->toxav, avcallback_audio, globals);
+	toxav_register_video_recv_callback(globals->toxav, avcallback_video, globals);
+
+	return ((jlong) ((intptr_t) globals));
+}
+
+JNIEXPORT void JNICALL Java_im_tox_jtoxcore_JTox_toxav_1kill
+(JNIEnv *env, jobject obj, jlong messenger)
+{
+	ToxAv *tox_av = ((tox_av_jni_globals_t *) ((intptr_t) messenger))->toxav;
+	tox_av_jni_globals_t *globals = (tox_av_jni_globals_t *) ((intptr_t) messenger);
+	toxav_kill(tox_av);
+	(*env)->DeleteGlobalRef(env, globals->handler);
+	free(globals);
+	UNUSED(obj);
+}
+
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_toxav_1call
+(JNIEnv *env, jobject obj, jlong messenger, jint friend_id, jobject codec_settings, jint ringing_seconds)
+{
+	ToxAvCSettings codec_settings_native;
+	int32_t id;
+	jint res;
+
+	ToxAv *tox_av = ((tox_av_jni_globals_t *) ((intptr_t) messenger))->toxav;
+	codec_settings_native = codec_settings_to_native(env, codec_settings);
+	res = toxav_call(tox_av, &id, friend_id, &codec_settings_native, ringing_seconds);
+	UNUSED(obj);
+	return res;
+}
+
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_toxav_1hangup
+(JNIEnv *env, jobject obj, jlong messenger, jint call_index)
+{
+	ToxAv *tox_av = ((tox_av_jni_globals_t *) ((intptr_t) messenger))->toxav;
+	jint res = toxav_hangup(tox_av, (int32_t) call_index);
+	UNUSED(obj);
+	UNUSED(env);
+	return res;
+}
+
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_toxav_1answer
+(JNIEnv *env, jobject obj, jlong messenger, jint call_index, jobject codec_settings)
+{
+	ToxAvCSettings codec_settings_native;
+	jint res;
+
+	ToxAv *tox_av = ((tox_av_jni_globals_t *) ((intptr_t) messenger))->toxav;
+	codec_settings_native = codec_settings_to_native(env, codec_settings);
+	res = toxav_answer(tox_av, (int32_t) call_index, &codec_settings_native);
+	UNUSED(obj);
+	return res;
+}
+
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_toxav_1reject
+(JNIEnv *env, jobject obj, jlong messenger, jint call_index, jstring reason)
+{
+	ToxAv *tox_av = ((tox_av_jni_globals_t *) ((intptr_t) messenger))->toxav;
+	const char *reason_native = (*env)->GetStringUTFChars(env, reason, 0);
+	jint res = toxav_reject(tox_av, (int32_t) call_index, reason_native);
+	UNUSED(obj);
+	return res;
+}
+
+
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_toxav_1cancel
+(JNIEnv *env, jobject obj, jlong messenger, jint call_index, jint peer_id, jstring reason)
+{
+	ToxAv *tox_av = ((tox_av_jni_globals_t *) ((intptr_t) messenger))->toxav;
+	const char *reason_native = (*env)->GetStringUTFChars(env, reason, 0);
+	jint res = toxav_cancel(tox_av, (int32_t) call_index, (int) peer_id, reason_native);
+	UNUSED(obj);
+	return res;
+}
+
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_toxav_1change_1settings
+(JNIEnv *env, jobject obj, jlong messenger, jint call_index, jobject codec_settings)
+{
+	ToxAvCSettings codec_settings_native;
+	jint res;
+
+	ToxAv *tox_av = ((tox_av_jni_globals_t *) ((intptr_t) messenger))->toxav;
+	codec_settings_native = codec_settings_to_native(env, codec_settings);
+	res = toxav_change_settings(tox_av, (int32_t) call_index, &codec_settings_native);
+	UNUSED(obj);
+	return res;
+}
+
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_toxav_1stop_1call
+(JNIEnv *env, jobject obj, jlong messenger, jint call_index)
+{
+	ToxAv *tox_av = ((tox_av_jni_globals_t *) ((intptr_t) messenger))->toxav;
+	jint res = toxav_stop_call(tox_av, (int32_t) call_index);
+	UNUSED(obj);
+	UNUSED(env);
+	return res;
+}
+
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_toxav_1prepare_1transmission
+(JNIEnv *env, jobject obj, jlong messenger, jint call_index,
+ jint jbuf_size, jint VAD_threshold, jint support_video)
+{
+	ToxAv *tox_av = ((tox_av_jni_globals_t *) ((intptr_t) messenger))->toxav;
+	jint res = toxav_prepare_transmission(tox_av, (int32_t) call_index, (uint32_t) jbuf_size, (uint32_t) VAD_threshold, (int) support_video);
+	UNUSED(obj);
+	UNUSED(env);
+	return res;
+}
+
+
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_toxav_1kill_1transmission
+(JNIEnv *env, jobject obj, jlong messenger, jint call_index)
+{
+	ToxAv *tox_av = ((tox_av_jni_globals_t *) ((intptr_t) messenger))->toxav;
+	jint res = toxav_kill_transmission(tox_av, (int32_t) call_index);
+	UNUSED(obj);
+	UNUSED(env);
+	return res;
+}
+
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_toxav_1send_1video
+(JNIEnv *env, jobject obj, jlong messenger, jint call_index,
+ jbyteArray frame, jint frame_size)
+{
+	ToxAv *tox_av = ((tox_av_jni_globals_t *) ((intptr_t) messenger))->toxav;
+	jbyte *_frame = (*env)->GetByteArrayElements(env, frame, 0);
+	jint res = toxav_send_video(tox_av, (int32_t) call_index, (uint8_t *) _frame, frame_size);
+	(*env)->ReleaseByteArrayElements(env, frame, _frame, JNI_ABORT);
+	UNUSED(obj);
+	return res;
+}
+
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_toxav_1send_1audio
+(JNIEnv *env, jobject obj, jlong messenger, jint call_index,
+ jbyteArray frame, jint frame_size)
+{
+	ToxAv *tox_av = ((tox_av_jni_globals_t *) ((intptr_t) messenger))->toxav;
+	jbyte *_frame = (*env)->GetByteArrayElements(env, frame, 0);
+	jint res = toxav_send_audio(tox_av, (int32_t) call_index, (uint8_t *) _frame, frame_size);
+	(*env)->ReleaseByteArrayElements(env, frame, _frame, JNI_ABORT);
+	UNUSED(obj);
+	return res;
+}
+
+
+JNIEXPORT jbyteArray JNICALL Java_im_tox_jtoxcore_JTox_toxav_1prepare_1video_1frame
+(JNIEnv *env, jobject obj, jlong messenger, jint call_index, jint dest_max, jbyteArray data, jint width, jint height)
+{
+	jbyteArray output;
+	vpx_image_t img;
+	ToxAv *tox_av = ((tox_av_jni_globals_t *) ((intptr_t) messenger))->toxav;
+	int stride = ALIGN(width, 16);
+	int y_size = stride * height;
+	int c_stride = ALIGN(stride / 2, 16);
+	int c_size = c_stride * height / 2;
+	//int size = y_size + c_size*2;
+	int cr_offset = y_size;
+	int cb_offset = y_size + c_size;
+	uint8_t y;
+	uint8_t v;
+	uint8_t u;
+	jbyte *_data = (*env)->GetByteArrayElements(env, data, 0);
+	vpx_img_alloc(&img, VPX_IMG_FMT_YV12, width, height, 1);
+	unsigned long int y_coord, x_coord;
+
+	for (y_coord = 0; y_coord < img.d_h; ++y_coord) {
+		for (x_coord = 0; x_coord < img.d_w; ++x_coord) {
+			y = *(_data + (y_coord * stride) + x_coord);
+			img.planes[0][y * (img.stride[0] + x_coord)] = y;
+
+			if (x_coord == (x_coord / 2) * 2) {
+				v = *(_data + cr_offset + (y_coord * c_stride) + x_coord / 2);
+				img.planes[1][y * (img.stride[1] + x_coord / 2)] = v;
+				u = *(_data + cb_offset + (y_coord * c_stride) + x_coord / 2);
+				img.planes[2][y * (img.stride[2] + x_coord / 2)] = u;
+			}
+		}
+	}
+
+	jbyte *dest = malloc(sizeof(jbyte) * dest_max);
+	jint res = toxav_prepare_video_frame(tox_av, (int32_t) call_index,
+										 (uint8_t *) dest, dest_max, &img);
+	(*env)->ReleaseByteArrayElements(env, data, _data, JNI_ABORT);
+	output = (*env)->NewByteArray(env, res);
+	(*env)->SetByteArrayRegion(env, output, 0, res, dest);
+	free(dest);
+
+	UNUSED(obj);
+	return output;
+}
+
+JNIEXPORT jbyteArray JNICALL Java_im_tox_jtoxcore_JTox_toxav_1prepare_1audio_1frame
+(JNIEnv *env, jobject obj, jlong messenger, jint call_index, jint dest_max, jintArray frame, jint frame_size)
+{
+	jbyteArray output;
+	jbyte *dest = malloc(sizeof(jbyte) * dest_max);
+	ToxAv *tox_av = ((tox_av_jni_globals_t *) ((intptr_t) messenger))->toxav;
+	jint *_frame = (*env)->GetIntArrayElements(env, frame, 0);
+	jint res = toxav_prepare_audio_frame(tox_av, (int32_t) call_index,
+										 (uint8_t *) dest, dest_max, (int16_t *) _frame, frame_size);
+	output = (*env)->NewByteArray(env, res);
+	(*env)->SetByteArrayRegion(env, output, 0, res, dest);
+	free(dest);
+	(*env)->ReleaseIntArrayElements(env, frame, _frame, JNI_ABORT);
+
+	UNUSED(obj);
+	return output;
+}
+
+JNIEXPORT jobject JNICALL Java_im_tox_jtoxcore_JTox_toxav_1get_1peer_1csettings
+(JNIEnv *env, jobject obj, jlong messenger, jint call_index, jint peer)
+{
+	ToxAvCSettings _dest;
+	ToxAv *tox_av;
+	jobject java_codec_settings;
+
+	tox_av = ((tox_av_jni_globals_t *) ((intptr_t) messenger))->toxav;
+	toxav_get_peer_csettings(tox_av, (int32_t) call_index, peer, &_dest);
+	java_codec_settings = codec_settings_to_java(env, _dest);
+	UNUSED(obj);
+	return java_codec_settings;
+}
+
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_toxav_1get_1peer_1id
+(JNIEnv *env, jobject obj, jlong messenger, jint call_index, jint peer)
+{
+	ToxAv *tox_av = ((tox_av_jni_globals_t *) ((intptr_t) messenger))->toxav;
+	jint res = toxav_get_peer_id(tox_av, (int32_t) call_index, peer);
+	UNUSED(obj);
+	UNUSED(env);
+	return res;
+}
+
+JNIEXPORT jobject JNICALL Java_im_tox_jtoxcore_JTox_toxav_1get_1call_1state
+(JNIEnv *env, jobject obj, jlong messenger, jint call_index)
+{
+	jfieldID enum_field_id;
+	jobject call_state;
+	jclass enum_class;
+	ToxAv *tox_av = ((tox_av_jni_globals_t *) ((intptr_t) messenger))->toxav;
+	ToxAvCallState res = toxav_get_call_state(tox_av, (int32_t) call_index);
+	enum_class = (*env)->FindClass(env, "im/tox/jtoxcore/ToxAvCallState");
+
+	switch (res) {
+		case av_CallNonExistant:
+			enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "CALL_NONEXISTANT", "Lim/tox/jtoxcore/ToxAvCallState");
+			break;
+		case av_CallInviting:
+			enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "CALL_INVITING", "Lim/tox/jtoxcore/ToxAvCallState");
+			break;
+		case av_CallStarting:
+			enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "CALL_STARTING", "Lim/tox/jtoxcore/ToxAvCallState");
+			break;
+		case av_CallActive:
+			enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "CALL_ACTIVE", "Lim/tox/jtoxcore/ToxAvCallState");
+			break;
+		case av_CallHold:
+			enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "CALL_HOLD", "Lim/tox/jtoxcore/ToxAvCallState");
+			break;
+		case av_CallHanged_up:
+			enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "CALL_HANGED_UP", "Lim/tox/jtoxcore/ToxAvCallState");
+			break;
+	}
+
+	call_state = (*env)->GetStaticObjectField(env, enum_class, enum_field_id);
+	UNUSED(obj);
+	return call_state;
+}
+
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_toxav_1capability_1supported
+(JNIEnv *env, jobject obj, jlong messenger, jint call_index, jobject capabilities)
+{
+	jclass enum_class;
+	jmethodID get_name_method;
+	jstring enum_name;
+	const char *enum_name_native;
+	ToxAvCapabilities capabilities_native;
+	ToxAv *tox_av = ((tox_av_jni_globals_t *) ((intptr_t) messenger))->toxav;
+	enum_class = (*env)->FindClass(env, "im/tox/jtoxcore/ToxAvCapabilities");
+	get_name_method = (*env)->GetMethodID(env, enum_class, "name", "()Ljava/lang/String;");
+	enum_name = (jstring)(*env)->CallObjectMethod(env, capabilities, get_name_method);
+	enum_name_native = (*env)->GetStringUTFChars(env, enum_name, 0);
+
+	if (strcmp(enum_name_native, "AUDIO_ENCODING") == 0) {
+		capabilities_native = AudioEncoding;
+	} else if (strcmp(enum_name_native, "AUDIO_DECODING") == 0) {
+		capabilities_native = AudioDecoding;
+	} else if (strcmp(enum_name_native, "VIDEO_ENCODING") == 0) {
+		capabilities_native = VideoEncoding;
+	} else if (strcmp(enum_name_native, "VIDEO_DECODING") == 0) {
+		capabilities_native = VideoDecoding;
+	}
+
+	jint res = toxav_capability_supported(tox_av, (int32_t) call_index, capabilities_native);
+	UNUSED(obj);
+	return res;
+}
+
+/*
+ * Class:     im_tox_jtoxcore_JTox
+ * Method:    toxav_get_tox
+ * Signature: (J)J
+ *
+JNIEXPORT jlong JNICALL Java_im_tox_jtoxcore_JTox_toxav_1get_1tox
+  (JNIEnv *, jobject, jlong);
+
+ *
+ * Class:     im_tox_jtoxcore_JTox
+ * Method:    toxav_has_activity
+ * Signature: (JI[IIF)I
+ *
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_toxav_1has_1activity
+  (JNIEnv *env, jobject obj, jlong messenger, jint, jintArray, jint, jfloat);
+**
  * End general section
  */
 
@@ -723,13 +1062,11 @@ static void callback_filedata(Tox *tox, int32_t friendnumber, uint8_t filenumber
 	ATTACH_THREAD(ptr, env);
 	clazz = (*env)->GetObjectClass(env, ptr->handler);
 	meth = (*env)->GetMethodID(env, clazz, "onFileData", "(II[B)V");
-	(*env)->DeleteLocalRef(env, clazz);
 
 	_data = (*env)->NewByteArray(env, length);
 	(*env)->SetByteArrayRegion(env, _data, 0, length, (jbyte *) data);
 
 	(*env)->CallVoidMethod(env, ptr->handler, meth, friendnumber, filenumber, _data);
-	(*env)->DeleteLocalRef(env, _data);
 	UNUSED(tox);
 }
 
@@ -976,4 +1313,141 @@ static void callback_typingstatus(Tox *tox, int32_t friendnumber, uint8_t is_typ
 	(*env)->CallVoidMethod(env, ptr->handler, handlermeth, friendnumber, _is_typing);
 
 	UNUSED(tox);
+}
+static void avcallback_invite(void *tox_av, int32_t call_id, void *user_data)
+{
+	avcallback_helper(call_id, user_data, "ON_INVITE");
+
+	UNUSED(tox_av);
+}
+static void avcallback_start(void *tox_av, int32_t call_id, void *user_data)
+{
+	avcallback_helper(call_id, user_data, "ON_START");
+
+	UNUSED(tox_av);
+}
+static void avcallback_cancel(void *tox_av, int32_t call_id, void *user_data)
+{
+	avcallback_helper(call_id, user_data, "ON_CANCEL");
+
+	UNUSED(tox_av);
+}
+static void avcallback_reject(void *tox_av, int32_t call_id, void *user_data)
+{
+	avcallback_helper(call_id, user_data, "ON_REJECT");
+
+	UNUSED(tox_av);
+}
+static void avcallback_end(void *tox_av, int32_t call_id, void *user_data)
+{
+	avcallback_helper(call_id, user_data, "ON_END");
+
+	UNUSED(tox_av);
+}
+static void avcallback_ringing(void *tox_av, int32_t call_id, void *user_data)
+{
+	avcallback_helper(call_id, user_data, "ON_RINGING");
+
+	UNUSED(tox_av);
+}
+static void avcallback_starting(void *tox_av, int32_t call_id, void *user_data)
+{
+	avcallback_helper(call_id, user_data, "ON_STARTING");
+
+	UNUSED(tox_av);
+}
+static void avcallback_ending(void *tox_av, int32_t call_id, void *user_data)
+{
+	avcallback_helper(call_id, user_data, "ON_ENDING");
+
+	UNUSED(tox_av);
+}
+static void avcallback_requesttimeout(void *tox_av, int32_t call_id, void *user_data)
+{
+	avcallback_helper(call_id, user_data, "ON_REQUEST_TIMEOUT");
+
+	UNUSED(tox_av);
+}
+static void avcallback_peertimeout(void *tox_av, int32_t call_id, void *user_data)
+{
+	avcallback_helper(call_id, user_data, "ON_PEER_TIMEOUT");
+
+	UNUSED(tox_av);
+}
+static void avcallback_mediachange(void *tox_av, int32_t call_id, void *user_data)
+{
+	avcallback_helper(call_id, user_data, "ON_MEDIA_CHANGE");
+
+	UNUSED(tox_av);
+}
+static void avcallback_audio(ToxAv *tox_av, int32_t call_id, int16_t *pcm_data, int pcm_data_length, void *user_data)
+{
+	tox_av_jni_globals_t *globals = (tox_av_jni_globals_t *) user_data;
+	JNIEnv *env;
+	jclass handlerclass;
+	jmethodID handlermeth;
+	jclass jtoxclass;
+	jmethodID jtoxmeth;
+	jbyteArray output;
+
+	//create java byte array from pcm data
+	jbyte _output[pcm_data_length];
+	output = (*env)->NewByteArray(env, pcm_data_length);
+	(*env)->SetByteArrayRegion(env, output, 0, pcm_data_length, _output);
+
+	//call java methods
+	handlerclass = (*env)->GetObjectClass(env, globals->handler);
+	handlermeth = (*env)->GetMethodID(env, handlerclass,
+									  "onAudioData", "(I[B)V");
+	jtoxclass = (*env)->GetObjectClass(env, globals->jtox);
+	jtoxmeth = (*env)->GetMethodID(env, jtoxclass, "onAudioAudio", "(I[B)V");
+	(*env)->CallVoidMethod(env, globals->jtox, jtoxmeth, call_id, output);
+	(*env)->CallVoidMethod(env, globals->handler, handlermeth, call_id, output);
+}
+static void avcallback_video(ToxAv *tox_av, int32_t call_id, vpx_image_t *img, void *user_data)
+{
+	tox_av_jni_globals_t *globals = (tox_av_jni_globals_t *) user_data;
+	JNIEnv *env;
+	jclass handlerclass;
+	jmethodID handlermeth;
+
+	ATTACH_THREAD(globals, env);
+
+	//Create Android YV12 byte array from vpx_image
+	jbyteArray output;
+	int stride = ALIGN(img->d_w, 16);
+	int y_size = stride * (img->d_h);
+	int c_stride = ALIGN(stride / 2, 16);
+	int c_size = c_stride * (img->d_h) / 2;
+	int size = y_size + c_size * 2;
+	int cr_offset = y_size;
+	int cb_offset = y_size + c_size;
+	uint8_t y;
+	uint8_t v;
+	uint8_t u;
+	jbyte _output[size];
+	unsigned long int y_coord, x_coord;
+
+	for (y_coord = 0; y_coord < img->d_h; ++y_coord) {
+		for (x_coord = 0; x_coord < img->d_w; ++x_coord) {
+			y = (img->planes[0][((y_coord * img->stride[0]), x_coord)]);
+			_output[(y_coord * stride) + x_coord] = y;
+
+			if (x_coord == (x_coord / 2) * 2) {
+				v = (img->planes[1][((y_coord * (img->stride[1] / 2)), x_coord / 2)]);
+				_output[cr_offset + (y_coord * c_stride) + x_coord / 2] = v;
+				u = (img->planes[2][((y_coord * (img->stride[2] / 2)), x_coord / 2)]);
+				_output[cb_offset + (y_coord * c_stride) + x_coord / 2] = u;
+			}
+		}
+	}
+
+	output = (*env)->NewByteArray(env, size);
+	(*env)->SetByteArrayRegion(env, output, 0, size, _output);
+
+	//call java methods
+	handlerclass = (*env)->GetObjectClass(env, globals->handler);
+	handlermeth = (*env)->GetMethodID(env, handlerclass,
+									  "onVideoData", "(I[BII)V");
+	(*env)->CallVoidMethod(env, globals->handler, handlermeth, call_id, output, img->d_w, img->d_h);
 }

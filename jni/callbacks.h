@@ -18,13 +18,6 @@
  *  along with jToxcore.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-typedef struct {
-	Tox *tox;
-	JavaVM *jvm;
-	jobject handler;
-	jobject jtox;
-} tox_jni_globals_t;
-
 static void callback_friendrequest(Tox *, uint8_t *, uint8_t *, uint16_t, void *);
 static void callback_friendmessage(Tox *, int, uint8_t *, uint16_t, void *);
 static void callback_action(Tox *, int32_t, uint8_t *, uint16_t, void *);
@@ -37,3 +30,18 @@ static void callback_typingstatus(Tox *, int32_t, uint8_t, void *);
 static void callback_filecontrol(Tox *, int32_t, uint8_t, uint8_t, uint8_t, uint8_t *, uint16_t, void *);
 static void callback_filedata(Tox *, int32_t, uint8_t, uint8_t *, uint16_t, void *);
 static void callback_filesendrequest(Tox *, int32_t, uint8_t, uint64_t, uint8_t *, uint16_t, void *);
+static void avcallback_invite(void *, int32_t, void *);
+static void avcallback_start(void *, int32_t, void *);
+static void avcallback_cancel(void *, int32_t, void *);
+static void avcallback_reject(void *, int32_t, void *);
+static void avcallback_end(void *, int32_t, void *);
+static void avcallback_ringing(void *, int32_t, void *);
+static void avcallback_starting(void *, int32_t, void *);
+static void avcallback_ending(void *, int32_t, void *);
+static void avcallback_requesttimeout(void *, int32_t, void *);
+static void avcallback_peertimeout(void *, int32_t, void *);
+static void avcallback_mediachange(void *, int32_t, void *);
+static void avcallback_audio(ToxAv *, int32_t, int16_t *, int, void *);
+static void avcallback_video(ToxAv *, int32_t,  vpx_image_t *, void *);
+
+
