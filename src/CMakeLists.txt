@@ -20,8 +20,16 @@ set(CLEANFILES
     "${CLASSDIR}/im/tox/jtoxcore/FriendList.class"
     "${CLASSDIR}/im/tox/jtoxcore/ToxFriend.class"
     "${CLASSDIR}/im/tox/jtoxcore/ToxFileControl.class"
+    "${CLASSDIR}/im/tox/jtoxcore/ToxAvCallbackID.class"
+    "${CLASSDIR}/im/tox/jtoxcore/ToxAvCallState.class"
+    "${CLASSDIR}/im/tox/jtoxcore/ToxAvCapabilities.class"
+    "${CLASSDIR}/im/tox/jtoxcore/ToxCallType.class"
+    "${CLASSDIR}/im/tox/jtoxcore/ToxCodecSettings.class"
     "${CLASSDIR}/im/tox/jtoxcore/ToxOptions.class"
     "${CLASSDIR}/im/tox/jtoxcore/callbacks/OnActionCallback.class"
+    "${CLASSDIR}/im/tox/jtoxcore/callbacks/OnAudioDataCallback.class"
+    "${CLASSDIR}/im/tox/jtoxcore/callbacks/OnAvCallbackCallback.class"
+    "${CLASSDIR}/im/tox/jtoxcore/callbacks/OnVideoDataCallback.class"
     "${CLASSDIR}/im/tox/jtoxcore/callbacks/OnConnectionStatusCallback.class"
     "${CLASSDIR}/im/tox/jtoxcore/callbacks/OnMessageCallback.class"
     "${CLASSDIR}/im/tox/jtoxcore/callbacks/OnFriendRequestCallback.class"
@@ -49,6 +57,11 @@ set(JTOX_CORE
     im/tox/jtoxcore/FriendList.java
     im/tox/jtoxcore/ToxFriend.java
     im/tox/jtoxcore/ToxFileControl.java
+    im/tox/jtoxcore/ToxAvCallbackID.java
+    im/tox/jtoxcore/ToxAvCallState.java
+    im/tox/jtoxcore/ToxAvCapabilities.java
+    im/tox/jtoxcore/ToxCallType.java
+    im/tox/jtoxcore/ToxCodecSettings.java
     im/tox/jtoxcore/ToxOptions.java
 )
 
@@ -66,6 +79,9 @@ set(JTOX_CALLBACKS
     im/tox/jtoxcore/callbacks/OnFileDataCallback.java
     im/tox/jtoxcore/callbacks/OnFileSendRequestCallback.java
     im/tox/jtoxcore/callbacks/OnTypingChangeCallback.java
+    im/tox/jtoxcore/callbacks/OnAudioDataCallback.java
+    im/tox/jtoxcore/callbacks/OnVideoDataCallback.java
+    im/tox/jtoxcore/callbacks/OnAvCallbackCallback.java
     im/tox/jtoxcore/callbacks/CallbackHandler.java
 )
 
