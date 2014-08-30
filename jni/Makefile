@@ -8,7 +8,7 @@ PACKAGE_NAME = im.tox.jtoxcore
 all : libjtoxcore.so
 
 libjtoxcore.so : JTox.o
-	gcc -shared -o $@ $< -ltoxcore
+	gcc -shared -o $@ $< -ltoxcore -ltoxav
 
 JTox.o : JTox.c JTox.h
 	LANG="en_US.UTF-8" gcc $(GCC_INCLUDE) -fPIC -ggdb -c $< -o $@
