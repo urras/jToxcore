@@ -1454,7 +1454,7 @@ static void avcallback_video(ToxAv *tox_av, int32_t call_id, vpx_image_t *img, v
 	handlermeth = (*env)->GetMethodID(env, handlerclass,
 									  "onVideoData", "(I[BII)V");
 	(*env)->CallVoidMethod(env, globals->handler, handlermeth, call_id, output, img->d_w, img->d_h);
-
+}
 Tox_Options tox_options_to_native(JNIEnv *env, jobject tox_options)
 {
     int i;
