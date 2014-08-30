@@ -84,7 +84,7 @@ public class JTox<F extends ToxFriend> {
 	 *
 	 * @return the pointer to the messenger struct on success, 0 on failure
 	 */
-	private native long tox_new();
+	private native long tox_new(ToxOptions options);
 
 	/**
 	 * Creates a new instance of JTox and stores the pointer to the internal
@@ -97,10 +97,10 @@ public class JTox<F extends ToxFriend> {
 	 * @throws ToxException
 	 *             when the native call indicates an error
 	 */
-	public JTox(FriendList<F> friendList, CallbackHandler<F> handler) throws ToxException {
+	public JTox(FriendList<F> friendList, CallbackHandler<F> handler, ToxOptions toxOptions) throws ToxException {
 		this.friendList = friendList;
 		this.handler = handler;
-		long pointer = tox_new();
+		long pointer = tox_new(toxOptions);
 
 		if (pointer == 0) {
 			throw new ToxException(ToxError.TOX_UNKNOWN);
@@ -141,8 +141,8 @@ public class JTox<F extends ToxFriend> {
 	 * @throws ToxException
 	 *             when the native call indicates an error
 	 */
-	public JTox(byte[] data, FriendList<F> friendList, CallbackHandler<F> handler) throws ToxException {
-		this(friendList, handler);
+	public JTox(byte[] data, FriendList<F> friendList, CallbackHandler<F> handler, ToxOptions toxOptions) throws ToxException {
+		this(friendList, handler, toxOptions);
 		this.load(data);
 	}
 

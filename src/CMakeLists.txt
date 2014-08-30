@@ -20,6 +20,7 @@ set(CLEANFILES
     "${CLASSDIR}/im/tox/jtoxcore/FriendList.class"
     "${CLASSDIR}/im/tox/jtoxcore/ToxFriend.class"
     "${CLASSDIR}/im/tox/jtoxcore/ToxFileControl.class"
+    "${CLASSDIR}/im/tox/jtoxcore/ToxOptions.class"
     "${CLASSDIR}/im/tox/jtoxcore/callbacks/OnActionCallback.class"
     "${CLASSDIR}/im/tox/jtoxcore/callbacks/OnConnectionStatusCallback.class"
     "${CLASSDIR}/im/tox/jtoxcore/callbacks/OnMessageCallback.class"
@@ -48,6 +49,7 @@ set(JTOX_CORE
     im/tox/jtoxcore/FriendList.java
     im/tox/jtoxcore/ToxFriend.java
     im/tox/jtoxcore/ToxFileControl.java
+    im/tox/jtoxcore/ToxOptions.java
 )
 
 # Callback source files
