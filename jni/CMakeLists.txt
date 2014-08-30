@@ -24,6 +24,8 @@ endif()
 
 
 find_package(libtoxcore REQUIRED)
+find_package(libtoxav REQUIRED)
+find_package(libvpx REQUIRED)
 
 # Depending on whether we need jni_md.h or not, define the include directories
 if(${NEED_JNI_MD} MATCHES "y")
@@ -32,12 +34,16 @@ if(${NEED_JNI_MD} MATCHES "y")
 		"${JAVA_INCLUDE_PATH}"
 		"${JAVA_INCLUDE_PATH2}"
 		"${libtoxcore_INCLUDE_DIRS}"
+		"${libtoxav_INCLUDE_DIRS}"
+		"${libvpx_INCLUDE_DIRS}"
 	)
 else()
     include_directories(
         "${JNI_HEADER_LOCATION}"
         "${JAVA_INCLUDE_PATH}"
         "${libtoxcore_INCLUDE_DIRS}"
+	"${libtoxav_INCLUDE_DIRS}"
+	"${libvpx_INCLUDE_DIRS}"
     )
 endif()
 add_library(
@@ -54,6 +60,8 @@ endif()
 target_link_libraries(
 	${LIB_TARGET_NAME}
 	${libtoxcore_LIBRARIES}
+	${libtoxav_LIBRARIES}
+	${libvpx_LIBRARIES}
 	${WS2_32}
 )
 
