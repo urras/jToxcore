@@ -30,6 +30,7 @@ import im.tox.jtoxcore.JTox;
 import im.tox.jtoxcore.ToxFriend;
 import im.tox.jtoxcore.ToxFileControl;
 import im.tox.jtoxcore.ToxUserStatus;
+import im.tox.jtoxcore.ToxAvCallbackID;
 
 /**
  * Callback Handler class which contains methods to manage the callbacks for a
@@ -54,6 +55,9 @@ public class CallbackHandler<F extends ToxFriend> {
 	private List<OnFileControlCallback<F>> onFileControlCallbacks;
 	private List<OnFileDataCallback<F>> onFileDataCallbacks;
 	private List<OnFileSendRequestCallback<F>> onFileSendRequestCallbacks;
+	private List<OnAvCallbackCallback<F>> onAvCallbackCallbacks;
+	private List<OnVideoDataCallback<F>> onVideoDataCallbacks;
+	private List<OnAudioDataCallback<F>> onAudioDataCallbacks;
 
 	private FriendList<F> friendlist;
 
@@ -79,6 +83,9 @@ public class CallbackHandler<F extends ToxFriend> {
 		this.onFileControlCallbacks = Collections.synchronizedList(new ArrayList<OnFileControlCallback<F>>());
 		this.onFileDataCallbacks = Collections.synchronizedList(new ArrayList<OnFileDataCallback<F>>());
 		this.onFileSendRequestCallbacks = Collections.synchronizedList(new ArrayList<OnFileSendRequestCallback<F>>());
+		this.onAvCallbackCallbacks = Collections.synchronizedList(new ArrayList<OnAvCallbackCallback<F>>());
+		this.onVideoDataCallbacks = Collections.synchronizedList(new ArrayList<OnVideoDataCallback<F>>());
+		this.onAudioDataCallbacks = Collections.synchronizedList(new ArrayList<OnAudioDataCallback<F>>());
 	}
 
 	/**
@@ -913,5 +920,183 @@ public class CallbackHandler<F extends ToxFriend> {
 	public <T extends OnTypingChangeCallback<F>> void setOnTypingChangeCallbacks(List<T> callbacks) {
 		clearOnTypingChangeCallbacks();
 		registerOnTypingChangeCallbacks(callbacks);
+	}
+	/**
+	 * Hook for native API to invoke callback methods
+	 *
+	 * @param friendnumber
+	 *            the friend who changed their status
+	 * @param status
+	 *            the new status
+	 */
+	@SuppressWarnings("unused")
+	private void onAvCallback(int call_id, ToxAvCallbackID callback_id) {
+		synchronized (this.onAvCallbackCallbacks) {
+			for (OnAvCallbackCallback<F> cb : this.onAvCallbackCallbacks) {
+				cb.execute(call_id, callback_id);
+			}
+		}
+	}
+	/**
+	 * Add the specified callback
+	 *
+	 * @param callback
+	 *            callback to add
+	 */
+	public void registerOnAvCallbackCallback(OnAvCallbackCallback<F> callback) {
+		this.onAvCallbackCallbacks.add(callback);
+	}
+
+	/**
+	 * Remove the specified callback
+	 * @param callback callback to remove
+	 */
+	public void unregisterOnAvCallbackCallback(OnAvCallbackCallback<F> callback) {
+		this.onAvCallbackCallbacks.remove(callback);
+	}
+
+	/**
+	 * Remove all callbacks
+	 */
+	public void clearOnAvCallbackCallbacks() {
+		this.onAvCallbackCallbacks.clear();
+	}
+
+	/**
+	 * Add the specified callbacks
+	 * @param callbacks the callbacks to add
+	 */
+	public <T extends OnAvCallbackCallback<F>> void registerOnAvCallbackCallbacks(List<T> callbacks) {
+		for (T callback : callbacks) {
+			registerOnAvCallbackCallback(callback);
+		}
+	}
+
+	/**
+	 * Set the specified callbacks. All previously existing callbacks will be removed
+	 * @param callbacks the callbacks to set
+	 */
+	public <T extends OnAvCallbackCallback<F>> void setOnAvCallbackCallbacks(List<T> callbacks) {
+		clearOnAvCallbackCallbacks();
+		registerOnAvCallbackCallbacks(callbacks);
+	}
+	/**
+	 * Hook for native API to invoke callback methods
+	 *
+	 * @param friendnumber
+	 *            the friend who changed their status
+	 * @param status
+	 *            the new status
+	 */
+	@SuppressWarnings("unused")
+	private void onVideoData(int call_id, byte[] data, int width, int height) {
+		synchronized (this.onVideoDataCallbacks) {
+			for (OnVideoDataCallback<F> cb : this.onVideoDataCallbacks) {
+				cb.execute(call_id, data, width, height);
+			}
+		}
+	}
+	/**
+	 * Add the specified callback
+	 *
+	 * @param callback
+	 *            callback to add
+	 */
+	public void registerOnVideoDataCallback(OnVideoDataCallback<F> callback) {
+		this.onVideoDataCallbacks.add(callback);
+	}
+
+	/**
+	 * Remove the specified callback
+	 * @param callback callback to remove
+	 */
+	public void unregisterOnVideoDataCallback(OnVideoDataCallback<F> callback) {
+		this.onVideoDataCallbacks.remove(callback);
+	}
+
+	/**
+	 * Remove all callbacks
+	 */
+	public void clearOnVideoDataCallbacks() {
+		this.onVideoDataCallbacks.clear();
+	}
+
+	/**
+	 * Add the specified callbacks
+	 * @param callbacks the callbacks to add
+	 */
+	public <T extends OnVideoDataCallback<F>> void registerOnVideoDataCallbacks(List<T> callbacks) {
+		for (T callback : callbacks) {
+			registerOnVideoDataCallback(callback);
+		}
+	}
+
+	/**
+	 * Set the specified callbacks. All previously existing callbacks will be removed
+	 * @param callbacks the callbacks to set
+	 */
+	public <T extends OnVideoDataCallback<F>> void setOnVideoDataCallbacks(List<T> callbacks) {
+		clearOnVideoDataCallbacks();
+		registerOnVideoDataCallbacks(callbacks);
+	}
+	/**
+	 * Hook for native API to invoke callback methods
+	 *
+	 * @param friendnumber
+	 *            the friend who changed their status
+	 * @param status
+	 *            the new status
+	 */
+	@SuppressWarnings("unused")
+	private void onAudioData(int call_id, byte[] pcm_data) {
+
+		synchronized (this.onAudioDataCallbacks) {
+			for (OnAudioDataCallback<F> cb : this.onAudioDataCallbacks) {
+				cb.execute(call_id, pcm_data);
+			}
+		}
+	}
+	/**
+	 * Add the specified callback
+	 *
+	 * @param callback
+	 *            callback to add
+	 */
+	public void registerOnAudioDataCallback(OnAudioDataCallback<F> callback) {
+		this.onAudioDataCallbacks.add(callback);
+	}
+
+	/**
+	 * Remove the specified callback
+	 * @param callback callback to remove
+	 */
+	public void unregisterOnAudioDataCallback(OnAudioDataCallback<F> callback) {
+		this.onAudioDataCallbacks.remove(callback);
+	}
+
+	/**
+	 * Remove all callbacks
+	 */
+	public void clearOnAudioDataCallbacks() {
+		this.onAudioDataCallbacks.clear();
+	}
+
+	/**
+	 * Add the specified callbacks
+	 * @param callbacks the callbacks to add
+	 */
+	public <T extends OnAudioDataCallback<F>> void registerOnAudioDataCallbacks(List<T> callbacks) {
+		for (T callback : callbacks) {
+			registerOnAudioDataCallback(callback);
+		}
+	}
+
+	/**
+	 * Set the specified callbacks. All previously existing callbacks will be removed
+	 * @param callbacks the callbacks to set
+	 */
+	public <T extends OnAudioDataCallback<F>> void setOnAudioDataCallbacks(List<T> callbacks) {
+		clearOnAudioDataCallbacks();
+		registerOnAudioDataCallbacks(callbacks);
 	}
 }
