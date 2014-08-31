@@ -161,6 +161,7 @@ JNIEXPORT void JNICALL Java_im_tox_jtoxcore_JTox_tox_1kill(JNIEnv *env, jobject 
 	tox_jni_globals_t *globals = (tox_jni_globals_t *) ((intptr_t) messenger);
 	tox_kill(globals->tox);
 	(*env)->DeleteGlobalRef(env, globals->handler);
+	(*env)->DeleteGlobalRef(env, globals->jtox);
 	free(globals);
 	UNUSED(jobj);
 }
@@ -702,6 +703,7 @@ JNIEXPORT void JNICALL Java_im_tox_jtoxcore_JTox_toxav_1kill
 	tox_av_jni_globals_t *globals = (tox_av_jni_globals_t *) ((intptr_t) messenger);
 	toxav_kill(tox_av);
 	(*env)->DeleteGlobalRef(env, globals->handler);
+	(*env)->DeleteGlobalRef(env, globals->jtox);
 	free(globals);
 	UNUSED(obj);
 }
@@ -1402,6 +1404,8 @@ static void avcallback_audio(ToxAv *tox_av, int32_t call_id, int16_t *pcm_data, 
 	jmethodID jtoxmeth;
 	jbyteArray output;
 
+	ATTACH_THREAD(globals, env);
+	
 	//create java byte array from pcm data
 	jbyte _output[pcm_data_length];
 	output = (*env)->NewByteArray(env, pcm_data_length);
