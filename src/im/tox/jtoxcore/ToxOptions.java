@@ -21,34 +21,97 @@
 
 package im.tox.jtoxcore;
 
+/**
+ * ToxOptions is used in the JTox constructors to define how certain network functions should work.
+ * All fields are null by default.
+ */
 public class ToxOptions {
-    private boolean ipv6Enabled = true;
-    private boolean udpEnabled = true;
-    private boolean proxyEnabled = false;
+    private boolean ipv6Enabled;
+    private boolean udpEnabled;
+    private boolean proxyEnabled;
     private String proxyAddress;
     private int port;
 
     public ToxOptions() {
-        super();
     }
-    public void enableProxy(String address, int p) {
-        proxyEnabled = true;
+
+    /**
+     * Setter for ipv6Enabled
+     * @param enabled
+     */
+    public void setIpv6Enabled(boolean enabled) {
+        ipv6Enabled = enabled;
+    }
+
+    /**
+     * Setter for udpEnabled
+     * @param enabled
+     */
+    public void setUdpEnabled(boolean enabled) {
+        udpEnabled = enabled;
+    }
+
+    /**
+     * Setter for proxyEnabled
+     * @param enabled
+     */
+    public void setProxyEnabled(boolean enabled) {
+        proxyEnabled = enabled;
+    }
+
+    /**
+     * Setter for proxyAddress
+     * @param address
+     */
+    public void setProxyAddress(String address) {
         proxyAddress = address;
-        port = p;
     }
-    public void disableProxy() {
-        proxyEnabled = false;
+
+    /**
+     * Setter for port
+     * @param port
+     */
+    public void setPort(int port) {
+        this.port = port;
     }
-    public void enableUDP() {
-        udpEnabled = true;
+
+    /**
+     * Getter for ipv6Enabled
+     * @return true if ipv6 is enabled, false if disabled
+     */
+    public boolean getIpv6Enabled() {
+        return ipv6Enabled;
     }
-    public void disableUDP() {
-        udpEnabled = false;
+
+    /**
+     * Getter for udpEnabled
+     * @return true if udp is enabled, false if disabled
+     */
+    public boolean getUdpEnabled() {
+        return udpEnabled;
     }
-    public void enableIPv6() {
-        ipv6Enabled = true;
+
+    /**
+     * Getter for proxyEnabled
+     * @return true if proxy is enabled, false if disabled
+     */
+    public boolean getProxyEnabled() {
+        return proxyEnabled;
     }
-    public void disableIPv6() {
-        ipv6Enabled = false;
+
+    /**
+     * Getter for proxyAddress
+     * @return the current proxy address being used
+     */
+    public String getProxyAddress() {
+        return proxyAddress;
+    }
+
+    /**
+     * Getter for port
+     * @return the current port being used for the proxy
+     */
+    public int getPort() {
+        return port;
     }
 }
