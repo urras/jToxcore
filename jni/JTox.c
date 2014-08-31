@@ -83,7 +83,7 @@ JNIEXPORT jlong JNICALL Java_im_tox_jtoxcore_JTox_tox_1new(JNIEnv *env, jobject 
 	jobject handlerRef = (*env)->NewGlobalRef(env, handler);
 	jobject jtoxRef = (*env)->NewGlobalRef(env, jobj);
 	(*env)->GetJavaVM(env, &jvm);
-    	tox_options_native = tox_options_to_native(env, tox_options);
+    tox_options_native = tox_options_to_native(env, tox_options);
 	globals->tox = tox_new(&tox_options_native);
 	globals->jvm = jvm;
 	globals->handler = handlerRef;
@@ -139,6 +139,14 @@ JNIEXPORT void JNICALL Java_im_tox_jtoxcore_JTox_tox_1do(JNIEnv *env, jobject ob
 	tox_do(((tox_jni_globals_t *) ((intptr_t) messenger))->tox);
 	UNUSED(env);
 	UNUSED(obj);
+}
+
+JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_1do_1interval(JNIEnv *env, jobject obj, jlong messenger)
+{
+	jint result = tox_do_interval(((tox_jni_globals_t *) ((intptr_t) messenger))->tox);
+	UNUSED(env);
+	UNUSED(obj);
+	return result;
 }
 
 JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_1isconnected(JNIEnv *env, jobject obj, jlong messenger)
@@ -1466,26 +1474,27 @@ Tox_Options tox_options_to_native(JNIEnv *env, jobject tox_options)
     jfieldID proxy_address_fieldid;
     jfieldID port_fieldid;
     Tox_Options tox_options_native;
-    jboolean *ipv6enabled;
-    jboolean *udp_enabled;
-    jboolean *proxy_enabled;
-    jstring *proxy_address;
+    jboolean ipv6enabled;
+    jboolean udp_enabled;
+    jboolean proxy_enabled;
+    jstring proxy_address;
+    
     char *proxy_address_native;
     jint *port;
 
-    clazz = (*env)->FindClass(env, "im/tox/jtoxcore/ToxOptions");
-    ipv6enabled_fieldid = (*env)->GetFieldID(env, clazz, "ipv6Enabled", "Lim/tox/jtoxcore/ToxOptions");
-    udp_enabled_fieldid = (*env)->GetFieldID(env, clazz, "udpEnabled", "Lim/tox/jtoxcore/ToxOptions");
-    proxy_enabled_fieldid = (*env)->GetFieldID(env, clazz, "proxyEnabled", "Lim/tox/jtoxcore/ToxOptions");
-    proxy_address_fieldid = (*env)->GetFieldID(env, clazz, "proxyAddress", "Lim/tox/jtoxcore/ToxOptions");
-    port_fieldid = (*env)->GetFieldID(env, clazz, "port", "Lim/tox/jtoxcore/ToxOptions");
 
-    ipv6enabled = (*env)->GetObjectField(env, tox_options, ipv6enabled_fieldid);
-    udp_enabled = (*env)->GetObjectField(env, tox_options, udp_enabled_fieldid);
-    proxy_enabled = (*env)->GetObjectField(env, tox_options, proxy_enabled_fieldid);
-    proxy_address = (*env)->GetObjectField(env, tox_options, proxy_address_fieldid);
-    proxy_address_native = (*env)->GetStringUTFChars(env, proxy_address, JNI_FALSE);
-    port = (*env)->GetObjectField(env, tox_options, port_fieldid);
+    clazz = (*env)->FindClass(env, "im/tox/jtoxcore/ToxOptions");
+
+    ipv6enabled_fieldid   = (*env)->GetFieldID(env, clazz, "ipv6Enabled", "Z");
+    udp_enabled_fieldid   = (*env)->GetFieldID(env, clazz, "udpEnabled", "Z");
+    proxy_enabled_fieldid = (*env)->GetFieldID(env, clazz, "proxyEnabled", "Z");
+    proxy_address_fieldid = (*env)->GetFieldID(env, clazz, "proxyAddress", "Ljava/lang/String;");
+    port_fieldid          = (*env)->GetFieldID(env, clazz, "port", "I");
+    
+    
+    ipv6enabled   = (*env)->GetBooleanField(env, tox_options, ipv6enabled_fieldid);
+    udp_enabled   = (*env)->GetBooleanField(env, tox_options, udp_enabled_fieldid);
+    proxy_enabled = (*env)->GetBooleanField(env, tox_options, proxy_enabled_fieldid);
 
     if (ipv6enabled) {
         tox_options_native.ipv6enabled = 1;
@@ -1499,14 +1508,24 @@ Tox_Options tox_options_to_native(JNIEnv *env, jobject tox_options)
     }
     if (proxy_enabled) {
         tox_options_native.proxy_enabled = 1;
+
+        port          = (*env)->GetIntField(env, tox_options, port_fieldid);
+        tox_options_native.proxy_port = port;
+
+
+    	proxy_address = (*env)->GetObjectField(env, tox_options, proxy_address_fieldid);
+    	proxy_address_native = (*env)->GetStringUTFChars(env, proxy_address, JNI_FALSE);
+    	for (i = 0; i < sizeof(proxy_address_native); i++) {
+       		tox_options_native.proxy_address[i] = proxy_address_native[i];
+    	}
+    	tox_options_native.proxy_address[sizeof(proxy_address_native)] = '\0';
+    	(*env)->ReleaseStringUTFChars(env, proxy_address, proxy_address_native);
+
     } else {
-        tox_options_native.proxy_enabled = 0;
+    	tox_options_native.proxy_enabled = 0;
+    	tox_options_native.proxy_port = 0;
+    	tox_options_native.proxy_address[0] = '\0';
     }
-    for (i = 0; i < sizeof(proxy_address_native); i++) {
-        tox_options_native.proxy_address[i] = proxy_address_native[i];
-    }
-    tox_options_native.proxy_address[sizeof(proxy_address_native)] = '\0';
-    (*env)->ReleaseStringUTFChars(env, proxy_address, proxy_address_native);
-    tox_options_native.proxy_port = port;
+
     return tox_options_native;
 }
