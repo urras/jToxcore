@@ -541,8 +541,9 @@ public class JTox<F extends ToxFriend> {
 	 *            the friend
 	 * @param message
 	 *            the message
-	 * @return the message ID of the sent message. This is stored in the
-	 *         Friend's list of sent messages.
+	 * @return the message ID of the sent message. This is stored in the Friend's list of sent
+     *            messages. This value is also passed to the read receipt callback if the message
+     *            was received and should be compared to your list of stored values.
 	 * @throws ToxException
 	 *             if the instance has been killed or the message was not sent
 	 */
@@ -557,61 +558,6 @@ public class JTox<F extends ToxFriend> {
 
 			result = tox_send_message(this.messengerPointer, friend.getFriendnumber(), messageArray,
 									  messageArray.length);
-		} finally {
-			this.lock.unlock();
-		}
-
-		if (result == 0) {
-			throw new ToxException(ToxError.TOX_SEND_FAILED);
-		}
-
-		return result;
-	}
-
-	/**
-	 * Native call to tox_send_message_withid
-	 *
-	 * @param messengerPointer
-	 *            pointer to the internal messenger struct
-	 * @param friendnumber
-	 *            the number of the friend
-	 * @param message
-	 *            the message
-	 * @param length
-	 *            length of the message in bytes
-	 *
-	 * @param messageID
-	 *            the message ID to use
-	 * @return the message ID on success, 0 on failure
-	 */
-	private native int tox_send_message_withid(long messengerPointer, int friendnumber, byte[] message, int length,
-			int messageID);
-
-	/**
-	 * Sends a message to the specified friend, with a specified ID
-	 *
-	 * @param friend
-	 *            the friend
-	 * @param message
-	 *            the message
-	 * @param messageID
-	 *            the message ID to use
-	 * @return the message ID of the sent message. If you want to receive read
-	 *         receipts, hang on to this value.
-	 * @throws ToxException
-	 *             if the instance has been killed or the message was not sent.
-	 */
-	public int sendMessage(F friend, String message, int messageID) throws ToxException {
-		byte[] messageArray = getStringBytes(message);
-		int result;
-
-		this.lock.lock();
-
-		try {
-			checkPointer();
-
-			result = tox_send_message_withid(this.messengerPointer, friend.getFriendnumber(), messageArray,
-											 messageArray.length, messageID);
 		} finally {
 			this.lock.unlock();
 		}
