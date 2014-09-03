@@ -31,6 +31,12 @@ public class ToxOptions {
     private String proxyAddress;
     private int port;
 
+    /**
+     * Create a new Tox Options with necessary settings
+     * @param ipv6 - Enable or Disable ipv6
+     * @param udp - Enable or Disable UDP (Disabling will enable TCP only)
+     * @param proxy - Enable or Disable Proxy
+     */
     public ToxOptions(boolean ipv6, boolean udp, boolean proxy) {
         this.ipv6Enabled = ipv6;
         this.udpEnabled = udp;
