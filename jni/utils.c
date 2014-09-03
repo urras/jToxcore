@@ -131,19 +131,42 @@ void avcallback_helper(int32_t call_id, void *user_data, char *enum_name)
 	JNIEnv *env;
 	jclass enum_class;
 	jfieldID enum_field_id;
-	jclass handlerclass;
-	jmethodID handlermeth;
 	jobject callback_id;
 
 	ATTACH_THREAD(globals, env);
 
 	//create java callback id enum
 	enum_class = (*env)->FindClass(env, "im/tox/jtoxcore/ToxAvCallbackID");
-	enum_field_id = (*env)->GetStaticFieldID(env, enum_class, enum_name, "Lim/tox/jtoxcore/ToxCallbackID");
+	enum_field_id = (*env)->GetStaticFieldID(env, enum_class, enum_name, "Lim/tox/jtoxcore/ToxAvCallbackID;");
 	callback_id = (*env)->GetStaticObjectField(env, enum_class, enum_field_id);
 
-	//call java methods
-	handlerclass = (*env)->GetObjectClass(env, globals->handler);
-	handlermeth = (*env)->GetMethodID(env, handlerclass, "onAvCallback", "(ILim/tox/jtoxcore/ToxAvCallbackID;)V");
-	(*env)->CallVoidMethod(env, globals->handler, handlermeth, call_id, callback_id);
+    (*env)->CallVoidMethod(env, globals->handler, globals->cache->onAvCallbackMethodId, call_id, callback_id);
 }
+
+
+void fillCache(cachedId* cache, jobject handler, JNIEnv *env){
+    jclass handlerclass = (*env)->GetObjectClass(env, handler);
+    cache->onFileControlMethodId = (*env)->GetMethodID(env, handlerclass, "onFileControl",
+                                      "(IIILim/tox/jtoxcore/ToxFileControl;[B)V");
+    cache->onFileDataMethodId = (*env)->GetMethodID(env, handlerclass, "onFileData", "(II[B)V");
+    cache->onFileSendRequestMethodId = (*env)->GetMethodID(env, handlerclass, "onFileSendRequest", "(IIJ[B)V");
+    cache->onFriendRequestMethodId = (*env)->GetMethodID(env, handlerclass, "onFriendRequest", "(Ljava/lang/String;[B)V");
+    cache->onMessageMethodId = (*env)->GetMethodID(env, handlerclass, "onMessage", "(I[B)V");
+    cache->onActionMethodId = (*env)->GetMethodID(env, handlerclass, "onAction", "(I[B)V");
+    cache->onNameChangeMethodId = (*env)->GetMethodID(env, handlerclass, "onNameChange", "(I[B)V");
+    cache->onStatusMessageMethodId = (*env)->GetMethodID(env, handlerclass, "onStatusMessage", "(I[B)V");
+    cache->onUserStatusMethodId = (*env)->GetMethodID(env, handlerclass, "onUserStatus",
+                                                      "(ILim/tox/jtoxcore/ToxUserStatus;)V");
+    cache->onReadReceiptMethodId = (*env)->GetMethodID(env, handlerclass, "onReadReceipt", "(II)V");
+    cache->onConnectionStatusMethodId = (*env)->GetMethodID(env, handlerclass, "onConnectionStatus", "(IZ)V");
+    cache->onTypingChangeMethodId = (*env)->GetMethodID(env, handlerclass, "onTypingChange", "(IZ)V");
+    cache->onAudioDataMethodId = (*env)->GetMethodID(env, handlerclass,
+                                                     "onAudioData", "(I[B)V");
+    cache->onVideoDataMethodId = (*env)->GetMethodID(env, handlerclass,
+                                                     "onVideoData", "(I[BII)V");
+    cache->onAvCallbackMethodId = (*env)->GetMethodID(env, handlerclass, "onAvCallback", "(ILim/tox/jtoxcore/ToxAvCallbackID;)V");
+
+
+}
+
+
