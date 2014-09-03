@@ -23,7 +23,6 @@ package im.tox.jtoxcore;
 
 /**
  * ToxOptions is used in the JTox constructors to define how certain network functions should work.
- * All fields are null by default.
  */
 public class ToxOptions {
     private boolean ipv6Enabled;
@@ -32,7 +31,10 @@ public class ToxOptions {
     private String proxyAddress;
     private int port;
 
-    public ToxOptions() {
+    public ToxOptions(boolean ipv6, boolean udp, boolean proxy) {
+        this.ipv6Enabled = ipv6;
+        this.udpEnabled = udp;
+        this.proxyEnabled = proxy;
     }
 
     /**
