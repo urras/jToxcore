@@ -68,6 +68,8 @@ void addr_to_hex(uint8_t *addr, char *buf)
  * End Utilities section
  */
 
+
+
 /**
  * Begin maintenance section
  */
@@ -88,6 +90,8 @@ JNIEXPORT jlong JNICALL Java_im_tox_jtoxcore_JTox_tox_1new(JNIEnv *env, jobject 
 	globals->jvm = jvm;
 	globals->handler = handlerRef;
 	globals->jtox = jtoxRef;
+    globals->cache = malloc(sizeof(cachedId));
+    fillCache(globals->cache, globals->handler, env);
 
 	tox_callback_friend_action(globals->tox, callback_action, globals);
 
@@ -162,6 +166,7 @@ JNIEXPORT void JNICALL Java_im_tox_jtoxcore_JTox_tox_1kill(JNIEnv *env, jobject 
 	tox_kill(globals->tox);
 	(*env)->DeleteGlobalRef(env, globals->handler);
 	(*env)->DeleteGlobalRef(env, globals->jtox);
+	free(globals->cache);
 	free(globals);
 	UNUSED(jobj);
 }
@@ -665,6 +670,8 @@ JNIEXPORT jlong JNICALL Java_im_tox_jtoxcore_JTox_toxav_1new
 	globals->jvm = jvm;
 	globals->handler = handlerRef;
 	globals->jtox = jtoxRef;
+    globals->cache = malloc(sizeof(cachedId));
+    fillCache(globals->cache, globals->handler, env);
 
 	toxav_register_callstate_callback(globals->toxav, avcallback_invite, av_OnInvite, globals);
 	toxav_register_callstate_callback(globals->toxav, avcallback_start, av_OnStart, globals);
@@ -691,6 +698,7 @@ JNIEXPORT void JNICALL Java_im_tox_jtoxcore_JTox_toxav_1kill
 	toxav_kill(tox_av);
 	(*env)->DeleteGlobalRef(env, globals->handler);
 	(*env)->DeleteGlobalRef(env, globals->jtox);
+	free(globals->cache);
 	free(globals);
 	UNUSED(obj);
 }
@@ -923,22 +931,22 @@ JNIEXPORT jobject JNICALL Java_im_tox_jtoxcore_JTox_toxav_1get_1call_1state
 
 	switch (res) {
 		case av_CallNonExistant:
-			enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "CALL_NONEXISTANT", "Lim/tox/jtoxcore/ToxAvCallState");
+			enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "CALL_NONEXISTANT", "Lim/tox/jtoxcore/ToxAvCallState;");
 			break;
 		case av_CallInviting:
-			enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "CALL_INVITING", "Lim/tox/jtoxcore/ToxAvCallState");
+			enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "CALL_INVITING", "Lim/tox/jtoxcore/ToxAvCallState;");
 			break;
 		case av_CallStarting:
-			enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "CALL_STARTING", "Lim/tox/jtoxcore/ToxAvCallState");
+			enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "CALL_STARTING", "Lim/tox/jtoxcore/ToxAvCallState;");
 			break;
 		case av_CallActive:
-			enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "CALL_ACTIVE", "Lim/tox/jtoxcore/ToxAvCallState");
+			enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "CALL_ACTIVE", "Lim/tox/jtoxcore/ToxAvCallState;");
 			break;
 		case av_CallHold:
-			enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "CALL_HOLD", "Lim/tox/jtoxcore/ToxAvCallState");
+			enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "CALL_HOLD", "Lim/tox/jtoxcore/ToxAvCallState;");
 			break;
 		case av_CallHanged_up:
-			enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "CALL_HANGED_UP", "Lim/tox/jtoxcore/ToxAvCallState");
+			enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "CALL_HANGED_UP", "Lim/tox/jtoxcore/ToxAvCallState;");
 			break;
 	}
 
@@ -1003,8 +1011,6 @@ static void callback_filecontrol(Tox *tox, int32_t friendnumber, uint8_t receive
 {
 	tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
 	JNIEnv *env;
-	jclass handlerclass;
-	jmethodID handlermeth;
 	jbyteArray _data;
 	jclass control_enum;
 	char *enum_name;
@@ -1012,9 +1018,6 @@ static void callback_filecontrol(Tox *tox, int32_t friendnumber, uint8_t receive
 	jobject enum_val;
 
 	ATTACH_THREAD(ptr, env);
-	handlerclass = (*env)->GetObjectClass(env, ptr->handler);
-	handlermeth = (*env)->GetMethodID(env, handlerclass, "onFileControl",
-									  "(IIILim/tox/jtoxcore/ToxFileControl;[B)V");
 
 	control_enum = (*env)->FindClass(env, "im/tox/jtoxcore/ToxFileControl");
 
@@ -1046,7 +1049,7 @@ static void callback_filecontrol(Tox *tox, int32_t friendnumber, uint8_t receive
 	_data = (*env)->NewByteArray(env, length);
 	(*env)->SetByteArrayRegion(env, _data, 0, length, (jbyte *) data);
 
-	(*env)->CallVoidMethod(env, ptr->handler, handlermeth, friendnumber, receive_send, filenumber, enum_val, _data);
+    (*env)->CallVoidMethod(env, ptr->handler, ptr->cache->onFileControlMethodId, friendnumber, receive_send, filenumber, enum_val, _data);
 	UNUSED(tox);
 }
 
@@ -1055,18 +1058,14 @@ static void callback_filedata(Tox *tox, int32_t friendnumber, uint8_t filenumber
 {
 	tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
 	JNIEnv *env;
-	jclass clazz;
-	jmethodID meth;
 	jbyteArray _data;
 
-	ATTACH_THREAD(ptr, env);
-	clazz = (*env)->GetObjectClass(env, ptr->handler);
-	meth = (*env)->GetMethodID(env, clazz, "onFileData", "(II[B)V");
+    ATTACH_THREAD(ptr, env);
 
 	_data = (*env)->NewByteArray(env, length);
 	(*env)->SetByteArrayRegion(env, _data, 0, length, (jbyte *) data);
 
-	(*env)->CallVoidMethod(env, ptr->handler, meth, friendnumber, filenumber, _data);
+    (*env)->CallVoidMethod(env, ptr->handler, ptr->cache->onFileDataMethodId, friendnumber, filenumber, _data);
 	UNUSED(tox);
 }
 
@@ -1075,18 +1074,14 @@ static void callback_filesendrequest(Tox *tox, int32_t friendnumber, uint8_t fil
 {
 	tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
 	JNIEnv *env;
-	jclass clazz;
-	jmethodID meth;
 	jbyteArray _filename;
 
 	ATTACH_THREAD(ptr, env);
-	clazz = (*env)->GetObjectClass(env, ptr->handler);
-	meth = (*env)->GetMethodID(env, clazz, "onFileSendRequest", "(IIJ[B)V");
 
 	_filename = (*env)->NewByteArray(env, length);
 	(*env)->SetByteArrayRegion(env, _filename, 0, length, (jbyte *) filename);
 
-	(*env)->CallVoidMethod(env, ptr->handler, meth, friendnumber, filenumber, filesize, _filename);
+    (*env)->CallVoidMethod(env, ptr->handler, ptr->cache->onFileSendRequestMethodId, friendnumber, filenumber, filesize, _filename);
 	UNUSED(tox);
 }
 
@@ -1094,40 +1089,32 @@ static void callback_friendrequest(Tox *tox, uint8_t *pubkey, uint8_t *message, 
 {
 	tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
 	JNIEnv *env;
-	jclass clazz;
-	jmethodID meth;
 	char buf[ADDR_SIZE_HEX] = { 0 };
 	jstring _pubkey;
 	jbyteArray _message;
 
-	ATTACH_THREAD(ptr, env);
-	clazz = (*env)->GetObjectClass(env, ptr->handler);
-	meth = (*env)->GetMethodID(env, clazz, "onFriendRequest", "(Ljava/lang/String;[B)V");
+	ATTACH_THREAD(ptr, env);	
 
 	addr_to_hex(pubkey, buf);
 	_pubkey = (*env)->NewStringUTF(env, buf);
 	_message = (*env)->NewByteArray(env, length);
 	(*env)->SetByteArrayRegion(env, _message, 0, length, (jbyte *) message);
 
-	(*env)->CallVoidMethod(env, ptr->handler, meth, _pubkey, _message);
+    (*env)->CallVoidMethod(env, ptr->handler, ptr->cache->onFriendRequestMethodId, _pubkey, _message);
 	UNUSED(tox);
 }
 
 static void callback_friendmessage(Tox *tox, int friendnumber, uint8_t *message, uint16_t length, void *rptr)
 {
 	tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
-	JNIEnv *env;
-	jclass class;
-	jmethodID meth;
+    JNIEnv *env;
 	jbyteArray _message;
 
-	ATTACH_THREAD(ptr, env);
-	class = (*env)->GetObjectClass(env, ptr->handler);
-	meth = (*env)->GetMethodID(env, class, "onMessage", "(I[B)V");
+    ATTACH_THREAD(ptr, env);
 
 	_message = (*env)->NewByteArray(env, length);
 	(*env)->SetByteArrayRegion(env, _message, 0, length, (jbyte *) message);
-	(*env)->CallVoidMethod(env, ptr->handler, meth, friendnumber, _message);
+    (*env)->CallVoidMethod(env, ptr->handler, ptr->cache->onMessageMethodId, friendnumber, _message);
 
 	UNUSED(tox);
 }
@@ -1136,17 +1123,13 @@ static void callback_action(Tox *tox, int32_t friendnumber, uint8_t *action, uin
 {
 	tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
 	JNIEnv *env;
-	jclass class;
-	jmethodID meth;
 	jbyteArray _action;
 
 	ATTACH_THREAD(ptr, env);
-	class = (*env)->GetObjectClass(env, ptr->handler);
-	meth = (*env)->GetMethodID(env, class, "onAction", "(I[B)V");
 
 	_action = (*env)->NewByteArray(env, length);
 	(*env)->SetByteArrayRegion(env, _action, 0, length, (jbyte *) action);
-	(*env)->CallVoidMethod(env, ptr->handler, meth, friendnumber, _action);
+    (*env)->CallVoidMethod(env, ptr->handler, ptr->cache->onActionMethodId, friendnumber, _action);
 
 	UNUSED(tox);
 }
@@ -1155,24 +1138,14 @@ static void callback_namechange(Tox *tox, int32_t friendnumber, uint8_t *newname
 {
 	tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
 	JNIEnv *env;
-	jclass handlerClass;
-	jmethodID handlerMeth;
 
-	jclass jtoxclass;
-	jmethodID jToxmeth;
 	jbyteArray _newname;
 
 	ATTACH_THREAD(ptr, env);
-	handlerClass = (*env)->GetObjectClass(env, ptr->handler);
-	handlerMeth = (*env)->GetMethodID(env, handlerClass, "onNameChange", "(I[B)V");
-
-	jtoxclass = (*env)->GetObjectClass(env, ptr->jtox);
-	jToxmeth = (*env)->GetMethodID(env, jtoxclass, "onNameChange", "(I[B)V");
 
 	_newname = (*env)->NewByteArray(env, length);
 	(*env)->SetByteArrayRegion(env, _newname, 0, length, (jbyte *) newname);
-	(*env)->CallVoidMethod(env, ptr->jtox, jToxmeth, friendnumber, _newname);
-	(*env)->CallVoidMethod(env, ptr->handler, handlerMeth, friendnumber, _newname);
+    (*env)->CallVoidMethod(env, ptr->handler, ptr->cache->onNameChangeMethodId, friendnumber, _newname);
 
 	UNUSED(tox);
 }
@@ -1181,23 +1154,14 @@ static void callback_statusmessage(Tox *tox, int32_t friendnumber, uint8_t *news
 {
 	tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
 	JNIEnv *env;
-	jclass handlerclass;
-	jmethodID handlermeth;
 
-	jclass jtoxclass;
-	jmethodID jtoxmeth;
 	jbyteArray _newstatus;
 
 	ATTACH_THREAD(ptr, env);
-	handlerclass = (*env)->GetObjectClass(env, ptr->handler);
-	handlermeth = (*env)->GetMethodID(env, handlerclass, "onStatusMessage", "(I[B)V");
-	jtoxclass = (*env)->GetObjectClass(env, ptr->jtox);
-	jtoxmeth = (*env)->GetMethodID(env, jtoxclass, "onStatusMessage", "(I[B)V");
 
 	_newstatus = (*env)->NewByteArray(env, length);
 	(*env)->SetByteArrayRegion(env, _newstatus, 0, length, (jbyte *) newstatus);
-	(*env)->CallVoidMethod(env, ptr->jtox, jtoxmeth, friendnumber, _newstatus);
-	(*env)->CallVoidMethod(env, ptr->handler, handlermeth, friendnumber, _newstatus);
+    (*env)->CallVoidMethod(env, ptr->handler, ptr->cache->onStatusMessageMethodId, friendnumber, _newstatus);
 
 	UNUSED(tox);
 }
@@ -1206,11 +1170,6 @@ static void callback_userstatus(Tox *tox, int32_t friendnumber, uint8_t status, 
 {
 	tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
 	JNIEnv *env;
-	jclass handlerclass;
-	jmethodID handlermeth;
-
-	jclass jtoxclass;
-	jmethodID jtoxmeth;
 
 	jclass us_enum;
 	char *enum_name;
@@ -1219,11 +1178,6 @@ static void callback_userstatus(Tox *tox, int32_t friendnumber, uint8_t status, 
 	jobject enum_val;
 
 	ATTACH_THREAD(ptr, env);
-	handlerclass = (*env)->GetObjectClass(env, ptr->handler);
-	handlermeth = (*env)->GetMethodID(env, handlerclass, "onUserStatus",
-									  "(ILim/tox/jtoxcore/ToxUserStatus;)V");
-	jtoxclass = (*env)->GetObjectClass(env, ptr->jtox);
-	jtoxmeth = (*env)->GetMethodID(env, jtoxclass, "onUserStatus", "(ILim/tox/jtoxcore/ToxUserStatus;)V");
 	us_enum = (*env)->FindClass(env, "im/tox/jtoxcore/ToxUserStatus");
 
 	switch (status) {
@@ -1246,8 +1200,7 @@ static void callback_userstatus(Tox *tox, int32_t friendnumber, uint8_t status, 
 
 	fieldID = (*env)->GetStaticFieldID(env, us_enum, enum_name, "Lim/tox/jtoxcore/ToxUserStatus;");
 	enum_val = (*env)->GetStaticObjectField(env, us_enum, fieldID);
-	(*env)->CallVoidMethod(env, ptr->jtox, jtoxmeth, friendnumber, enum_val);
-	(*env)->CallVoidMethod(env, ptr->handler, handlermeth, friendnumber, enum_val);
+    (*env)->CallVoidMethod(env, ptr->handler, ptr->cache->onUserStatusMethodId, friendnumber, enum_val);
 
 	UNUSED(tox);
 }
@@ -1256,13 +1209,9 @@ static void callback_read_receipt(Tox *tox, int32_t friendnumber, uint32_t recei
 {
 	tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
 	JNIEnv *env;
-	jclass handlerclass;
-	jmethodID handlermeth;
 
 	ATTACH_THREAD(ptr, env);
-	handlerclass = (*env)->GetObjectClass(env, ptr->handler);
-	handlermeth = (*env)->GetMethodID(env, handlerclass, "onReadReceipt", "(II)V");
-	(*env)->CallVoidMethod(env, ptr->handler, handlermeth, friendnumber, receipt);
+    (*env)->CallVoidMethod(env, ptr->handler, ptr->cache->onReadReceiptMethodId, friendnumber, receipt);
 
 	UNUSED(tox);
 }
@@ -1271,22 +1220,12 @@ static void callback_connectionstatus(Tox *tox, int32_t friendnumber, uint8_t ne
 {
 	tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
 	JNIEnv *env;
-	jclass handlerclass;
-	jmethodID handlermeth;
-
-	jclass jtoxclass;
-	jmethodID jtoxmeth;
 
 	jboolean _newstatus;
 
 	ATTACH_THREAD(ptr, env);
-	handlerclass = (*env)->GetObjectClass(env, ptr->handler);
-	handlermeth = (*env)->GetMethodID(env, handlerclass, "onConnectionStatus", "(IZ)V");
-	jtoxclass = (*env)->GetObjectClass(env, ptr->jtox);
-	jtoxmeth = (*env)->GetMethodID(env, jtoxclass, "onConnectionStatus", "(IZ)V");
 	_newstatus = newstatus == 0 ? JNI_FALSE : JNI_TRUE;
-	(*env)->CallVoidMethod(env, ptr->jtox, jtoxmeth, friendnumber, _newstatus);
-	(*env)->CallVoidMethod(env, ptr->handler, handlermeth, friendnumber, _newstatus);
+    (*env)->CallVoidMethod(env, ptr->handler, ptr->cache->onConnectionStatusMethodId, friendnumber, _newstatus);
 
 	UNUSED(tox);
 }
@@ -1295,22 +1234,12 @@ static void callback_typingstatus(Tox *tox, int32_t friendnumber, uint8_t is_typ
 {
 	tox_jni_globals_t *ptr = (tox_jni_globals_t *) rptr;
 	JNIEnv *env;
-	jclass handlerclass;
-	jmethodID handlermeth;
-
-	jclass jtoxclass;
-	jmethodID jtoxmeth;
 
 	jboolean _is_typing;
 
 	ATTACH_THREAD(ptr, env);
-	handlerclass = (*env)->GetObjectClass(env, ptr->handler);
-	handlermeth = (*env)->GetMethodID(env, handlerclass, "onTypingChange", "(IZ)V");
-	jtoxclass = (*env)->GetObjectClass(env, ptr->jtox);
-	jtoxmeth = (*env)->GetMethodID(env, jtoxclass, "onTypingChange", "(IZ)V");
 	_is_typing = is_typing == 0 ? JNI_FALSE : JNI_TRUE;
-	(*env)->CallVoidMethod(env, ptr->jtox, jtoxmeth, friendnumber, _is_typing);
-	(*env)->CallVoidMethod(env, ptr->handler, handlermeth, friendnumber, _is_typing);
+    (*env)->CallVoidMethod(env, ptr->handler, ptr->cache->onTypingChangeMethodId, friendnumber, _is_typing);
 
 	UNUSED(tox);
 }
@@ -1385,10 +1314,6 @@ static void avcallback_audio(ToxAv *tox_av, int32_t call_id, int16_t *pcm_data, 
 {
 	tox_av_jni_globals_t *globals = (tox_av_jni_globals_t *) user_data;
 	JNIEnv *env;
-	jclass handlerclass;
-	jmethodID handlermeth;
-	jclass jtoxclass;
-	jmethodID jtoxmeth;
 	jbyteArray output;
 
 	ATTACH_THREAD(globals, env);
@@ -1398,20 +1323,12 @@ static void avcallback_audio(ToxAv *tox_av, int32_t call_id, int16_t *pcm_data, 
 	output = (*env)->NewByteArray(env, pcm_data_length);
 	(*env)->SetByteArrayRegion(env, output, 0, pcm_data_length, _output);
 
-	//call java methods
-	handlerclass = (*env)->GetObjectClass(env, globals->handler);
-	handlermeth = (*env)->GetMethodID(env, handlerclass,
-									  "onAudioData", "(I[B)V");
-	jtoxclass = (*env)->GetObjectClass(env, globals->jtox);
-	jtoxmeth = (*env)->GetMethodID(env, jtoxclass, "onAudioAudio", "(I[B)V");
-	(*env)->CallVoidMethod(env, globals->jtox, jtoxmeth, call_id, output);
-	(*env)->CallVoidMethod(env, globals->handler, handlermeth, call_id, output);
+    (*env)->CallVoidMethod(env, globals->handler, globals->cache->onAudioDataMethodId, call_id, output);
 }
 static void avcallback_video(ToxAv *tox_av, int32_t call_id, vpx_image_t *img, void *user_data)
 {
 	tox_av_jni_globals_t *globals = (tox_av_jni_globals_t *) user_data;
-	JNIEnv *env;
-	jclass handlerclass;
+    JNIEnv *env;
 	jmethodID handlermeth;
 
 	ATTACH_THREAD(globals, env);
@@ -1448,11 +1365,7 @@ static void avcallback_video(ToxAv *tox_av, int32_t call_id, vpx_image_t *img, v
 	output = (*env)->NewByteArray(env, size);
 	(*env)->SetByteArrayRegion(env, output, 0, size, _output);
 
-	//call java methods
-	handlerclass = (*env)->GetObjectClass(env, globals->handler);
-	handlermeth = (*env)->GetMethodID(env, handlerclass,
-									  "onVideoData", "(I[BII)V");
-	(*env)->CallVoidMethod(env, globals->handler, handlermeth, call_id, output, img->d_w, img->d_h);
+    (*env)->CallVoidMethod(env, globals->handler, globals->cache->onVideoDataMethodId, call_id, output, img->d_w, img->d_h);
 }
 
 Tox_Options tox_options_to_native(JNIEnv *env, jobject tox_options)
