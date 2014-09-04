@@ -48,7 +48,7 @@
 /**
  * Begin Utilities section
  */
-
+cachedId* cache;
 Tox_Options tox_options_to_native(JNIEnv *env, jobject tox_options);
 /**
  * Convert a given binary address to a human-readable, \0-terminated hexadecimal string
@@ -74,6 +74,43 @@ void addr_to_hex(uint8_t *addr, char *buf)
  * Begin maintenance section
  */
 
+jint JNI_OnLoad(JavaVM* jvm, void* aReserved)
+{
+    cache = malloc(sizeof(cachedId));
+    JNIEnv *env;
+
+
+    #ifdef ANDROID
+        (*jvm)->AttachCurrentThread(jvm, &env, 0);
+    #else
+        (*jvm)->AttachCurrentThread(jvm, (void **) &env, 0);
+    #endif
+
+    jclass handlerclass = (*env)->FindClass(env, "im/tox/jtoxcore/callbacks/CallbackHandler");
+
+    cache->onFileControlMethodId = (*env)->GetMethodID(env, handlerclass, "onFileControl",
+                                      "(IIILim/tox/jtoxcore/ToxFileControl;[B)V");
+    cache->onFileDataMethodId = (*env)->GetMethodID(env, handlerclass, "onFileData", "(II[B)V");
+    cache->onFileSendRequestMethodId = (*env)->GetMethodID(env, handlerclass, "onFileSendRequest", "(IIJ[B)V");
+    cache->onFriendRequestMethodId = (*env)->GetMethodID(env, handlerclass, "onFriendRequest", "(Ljava/lang/String;[B)V");
+    cache->onMessageMethodId = (*env)->GetMethodID(env, handlerclass, "onMessage", "(I[B)V");
+    cache->onActionMethodId = (*env)->GetMethodID(env, handlerclass, "onAction", "(I[B)V");
+    cache->onNameChangeMethodId = (*env)->GetMethodID(env, handlerclass, "onNameChange", "(I[B)V");
+    cache->onStatusMessageMethodId = (*env)->GetMethodID(env, handlerclass, "onStatusMessage", "(I[B)V");
+    cache->onUserStatusMethodId = (*env)->GetMethodID(env, handlerclass, "onUserStatus",
+                                                      "(ILim/tox/jtoxcore/ToxUserStatus;)V");
+    cache->onReadReceiptMethodId = (*env)->GetMethodID(env, handlerclass, "onReadReceipt", "(II)V");
+    cache->onConnectionStatusMethodId = (*env)->GetMethodID(env, handlerclass, "onConnectionStatus", "(IZ)V");
+    cache->onTypingChangeMethodId = (*env)->GetMethodID(env, handlerclass, "onTypingChange", "(IZ)V");
+    cache->onAudioDataMethodId = (*env)->GetMethodID(env, handlerclass,
+                                                     "onAudioData", "(I[B)V");
+    cache->onVideoDataMethodId = (*env)->GetMethodID(env, handlerclass,
+                                                     "onVideoData", "(I[BII)V");
+    cache->onAvCallbackMethodId = (*env)->GetMethodID(env, handlerclass, "onAvCallback", "(ILim/tox/jtoxcore/ToxAvCallbackID;)V");
+
+    return JNI_VERSION_1_6;
+}
+
 JNIEXPORT jlong JNICALL Java_im_tox_jtoxcore_JTox_tox_1new(JNIEnv *env, jobject jobj, jobject tox_options)
 {
 	tox_jni_globals_t *globals = malloc(sizeof(tox_jni_globals_t));
@@ -90,8 +127,7 @@ JNIEXPORT jlong JNICALL Java_im_tox_jtoxcore_JTox_tox_1new(JNIEnv *env, jobject 
 	globals->jvm = jvm;
 	globals->handler = handlerRef;
 	globals->jtox = jtoxRef;
-    globals->cache = malloc(sizeof(cachedId));
-    fillCache(globals->cache, globals->handler, env);
+    globals->cache = cache;
 
 	tox_callback_friend_action(globals->tox, callback_action, globals);
 
@@ -683,8 +719,7 @@ JNIEXPORT jlong JNICALL Java_im_tox_jtoxcore_JTox_toxav_1new
 	globals->jvm = jvm;
 	globals->handler = handlerRef;
 	globals->jtox = jtoxRef;
-    globals->cache = malloc(sizeof(cachedId));
-    fillCache(globals->cache, globals->handler, env);
+    globals->cache = cache;
 
 	toxav_register_callstate_callback(globals->toxav, avcallback_invite, av_OnInvite, globals);
 	toxav_register_callstate_callback(globals->toxav, avcallback_start, av_OnStart, globals);
