@@ -30,14 +30,14 @@ ToxAvCSettings codec_settings_to_native(JNIEnv *env, jobject codec_settings)
 	jfieldID audio_frame_duration_id;
 	jfieldID audio_sample_rate_id;
 	jfieldID audio_channels_id;
-	jobject *call_type_obj;
-	jint *video_bitrate;
-	jint *max_video_width;
-	jint *max_video_height;
-	jint *audio_bitrate;
-	jint *audio_frame_duration;
-	jint *audio_sample_rate;
-	jint *audio_channels;
+	jobject call_type_obj;
+	jint video_bitrate;
+	jint max_video_width;
+	jint max_video_height;
+	jint audio_bitrate;
+	jint audio_frame_duration;
+	jint audio_sample_rate;
+	jint audio_channels;
 	ToxAvCallType call_type;
 	jclass enum_class;
 	jmethodID get_name_method;
@@ -47,25 +47,25 @@ ToxAvCSettings codec_settings_to_native(JNIEnv *env, jobject codec_settings)
 
 	//Get java class for struct, and its field ids
 	clazz = (*env)->FindClass(env, "im/tox/jtoxcore/ToxCodecSettings");
-	call_type_id = (*env)->GetFieldID(env, clazz, "call_type", "Lim/tox/jtoxcore/ToxCodecSettings");
-	video_bitrate_id = (*env)->GetFieldID(env, clazz, "video_bitrate", "Lim/tox/jtoxcore/ToxCodecSettings");
-	max_video_width_id = (*env)->GetFieldID(env, clazz, "max_video_width", "Lim/tox/jtoxcore/ToxCodecSettings");
-	max_video_height_id = (*env)->GetFieldID(env, clazz, "max_video_height", "Lim/tox/jtoxcore/ToxCodecSettings");
-	audio_bitrate_id = (*env)->GetFieldID(env, clazz, "audio_bitrate", "Lim/tox/jtoxcore/ToxCodecSettings");
-	audio_frame_duration_id = (*env)->GetFieldID(env, clazz, "audio_frame_duration", "Lim/tox/jtoxcore/ToxCodecSettings");
-	audio_sample_rate_id = (*env)->GetFieldID(env, clazz, "audio_sample_rate", "Lim/tox/jtoxcore/ToxCodecSettings");
-	audio_channels_id = (*env)->GetFieldID(env, clazz, "audio_channels", "Lim/tox/jtoxcore/ToxCodecSettings");
+	call_type_id = (*env)->GetFieldID(env, clazz, "call_type", "Lim/tox/jtoxcore/ToxCallType;");
+	video_bitrate_id = (*env)->GetFieldID(env, clazz, "video_bitrate", "I");
+	max_video_width_id = (*env)->GetFieldID(env, clazz, "max_video_width", "I");
+	max_video_height_id = (*env)->GetFieldID(env, clazz, "max_video_height", "I");
+	audio_bitrate_id = (*env)->GetFieldID(env, clazz, "audio_bitrate", "I");
+	audio_frame_duration_id = (*env)->GetFieldID(env, clazz, "audio_frame_duration", "I");
+	audio_sample_rate_id = (*env)->GetFieldID(env, clazz, "audio_sample_rate", "I");
+	audio_channels_id = (*env)->GetFieldID(env, clazz, "audio_channels", "I");
 
 	//Get calltype java enum from call settings class
 	call_type_obj = (*env)->GetObjectField(env, codec_settings, call_type_id);
 	//Get remaining class members
-	video_bitrate = (*env)->GetObjectField(env, codec_settings, video_bitrate_id);
-	max_video_width = (*env)->GetObjectField(env, codec_settings, max_video_width_id);
-	max_video_height = (*env)->GetObjectField(env, codec_settings, max_video_height_id);
-	audio_bitrate = (*env)->GetObjectField(env, codec_settings, audio_bitrate_id);
-	audio_frame_duration = (*env)->GetObjectField(env, codec_settings, audio_frame_duration_id);
-	audio_sample_rate = (*env)->GetObjectField(env, codec_settings, audio_sample_rate_id);
-	audio_channels = (*env)->GetObjectField(env, codec_settings, audio_channels_id);
+	video_bitrate = (*env)->GetIntField(env, codec_settings, video_bitrate_id);
+	max_video_width = (*env)->GetIntField(env, codec_settings, max_video_width_id);
+	max_video_height = (*env)->GetIntField(env, codec_settings, max_video_height_id);
+	audio_bitrate = (*env)->GetIntField(env, codec_settings, audio_bitrate_id);
+	audio_frame_duration = (*env)->GetIntField(env, codec_settings, audio_frame_duration_id);
+	audio_sample_rate = (*env)->GetIntField(env, codec_settings, audio_sample_rate_id);
+	audio_channels = (*env)->GetIntField(env, codec_settings, audio_channels_id);
 
 	//Turn calltype java enum into c enum
 	enum_class = (*env)->FindClass(env, "im/tox/jtoxcore/ToxCallType");
@@ -80,13 +80,13 @@ ToxAvCSettings codec_settings_to_native(JNIEnv *env, jobject codec_settings)
 	}
 
 	codec_settings_native.call_type = call_type;
-	codec_settings_native.video_bitrate = *video_bitrate;
-	codec_settings_native.max_video_width = *max_video_width;
-	codec_settings_native.max_video_height = *max_video_height;
-	codec_settings_native.audio_bitrate = *audio_bitrate;
-	codec_settings_native.audio_frame_duration = *audio_frame_duration;
-	codec_settings_native.audio_sample_rate = *audio_sample_rate;
-	codec_settings_native.audio_channels = *audio_channels;
+	codec_settings_native.video_bitrate = video_bitrate;
+	codec_settings_native.max_video_width = max_video_width;
+	codec_settings_native.max_video_height = max_video_height;
+	codec_settings_native.audio_bitrate = audio_bitrate;
+	codec_settings_native.audio_frame_duration = audio_frame_duration;
+	codec_settings_native.audio_sample_rate = audio_sample_rate;
+	codec_settings_native.audio_channels = audio_channels;
 	return codec_settings_native;
 }
 
@@ -102,9 +102,9 @@ jobject codec_settings_to_java(JNIEnv *env, ToxAvCSettings codec_settings_native
 	enum_class = (*env)->FindClass(env, "im/tox/jtoxcore/ToxCallType");
 
 	if (codec_settings_native.call_type == TypeAudio) {
-		enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "TYPE_AUDIO", "Lim/tox/jtoxcore/ToxCallType");
+		enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "TYPE_AUDIO", "Lim/tox/jtoxcore/ToxCallType;");
 	} else if (codec_settings_native.call_type == TypeVideo) {
-		enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "TYPE_VIDEO", "Lim/tox/jtoxcore/ToxCallType");
+		enum_field_id = (*env)->GetStaticFieldID(env, enum_class, "TYPE_VIDEO", "Lim/tox/jtoxcore/ToxCallType;");
 	}
 
 	call_type = (*env)->GetStaticObjectField(env, enum_class, enum_field_id);
