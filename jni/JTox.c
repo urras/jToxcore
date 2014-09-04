@@ -319,19 +319,6 @@ JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_1send_1message(JNIEnv *env,
 	return mess_id;
 }
 
-JNIEXPORT jint JNICALL Java_im_tox_jtoxcore_JTox_tox_1send_1message_1withid(JNIEnv *env, jobject obj, jlong messenger,
-		jint friendnumber, jbyteArray message, jint length, jint messageID)
-{
-	jbyte *_message = (*env)->GetByteArrayElements(env, message, 0);
-
-	uint32_t mess_id = tox_send_message_withid(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, friendnumber,
-					   messageID, (uint8_t *) _message, length);
-	(*env)->ReleaseByteArrayElements(env, message, _message, JNI_ABORT);
-
-	UNUSED(obj);
-	return mess_id;
-}
-
 JNIEXPORT jboolean JNICALL Java_im_tox_jtoxcore_JTox_tox_1send_1action(JNIEnv *env, jobject obj, jlong messenger,
 		jint friendnumber, jbyteArray action, jint length)
 {
