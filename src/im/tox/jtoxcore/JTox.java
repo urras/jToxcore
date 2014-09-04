@@ -857,6 +857,10 @@ public class JTox<F extends ToxFriend> {
 
 			validPointers.remove(this.messengerPointer);
 			tox_kill(this.messengerPointer);
+
+			checkAvPointer();
+			validPointers.remove(this.avPointer);
+			toxav_kill(this.avPointer);
 		} finally {
 			this.lock.unlock();
 		}
@@ -1522,64 +1526,6 @@ public class JTox<F extends ToxFriend> {
 	}
 	/****** FILE SENDING FUNCTIONS END ******/
 
-
-
-	/**
-	 * Update the connection status if a connection status callback is invoked
-	 *
-	 * @param friendnumber
-	 *            friend's number
-	 * @param status
-	 *            new status (true if online, false if offline)
-	 */
-	private void onConnectionStatus(int friendnumber, boolean status) {
-		this.friendList.getByFriendNumber(friendnumber).setOnline(status);
-	}
-
-	/**
-	 * Update the name if a connection status callback is invoked
-	 *
-	 * @param friendnumber
-	 *            friend's number
-	 * @param newname
-	 *            new name
-	 */
-	private void onNameChange(int friendnumber, byte[] newname) {
-		this.friendList.getByFriendNumber(friendnumber).setName(getByteString(newname));
-	}
-
-	/**
-	 * Update the status message if a status message callback is invoked
-	 *
-	 * @param friendnumber
-	 *            the friendnumber
-	 * @param newMessage
-	 *            the new status message
-	 */
-	private void onStatusMessage(int friendnumber, byte[] newMessage) {
-		this.friendList.getByFriendNumber(friendnumber).setStatusMessage(getByteString(newMessage));
-	}
-
-	/**
-	 * Update the user status if a user status callback is invoked
-	 *
-	 * @param friendnumber
-	 *            the friendnumber
-	 * @param newStatus
-	 *            the new status
-	 */
-	private void onUserStatus(int friendnumber, ToxUserStatus newStatus) {
-		this.friendList.getByFriendNumber(friendnumber).setStatus(newStatus);
-	}
-
-	/**
-	 * Update the user typing status if a typing change callback is invoked
-	 * @param friendnumber the friendnumber
-	 * @param isTyping the friend's typing status
-	 */
-	private void onTypingChange(int friendnumber, boolean isTyping) {
-		this.friendList.getByFriendNumber(friendnumber).setTyping(isTyping);
-	}
 
 	/**
 	 * Utility method that checks the current pointer and throws an exception if
