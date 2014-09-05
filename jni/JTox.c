@@ -1101,6 +1101,9 @@ static void callback_filedata(Tox *tox, int32_t friendnumber, uint8_t filenumber
 	(*env)->SetByteArrayRegion(env, _data, 0, length, (jbyte *) data);
 
     (*env)->CallVoidMethod(env, ptr->handler, ptr->cache->onFileDataMethodId, friendnumber, filenumber, _data);
+
+    (*env)->DeleteLocalRef(_data);
+
 	UNUSED(tox);
 }
 
@@ -1358,6 +1361,8 @@ static void avcallback_audio(ToxAv *tox_av, int32_t call_id, int16_t *pcm_data, 
 	(*env)->SetByteArrayRegion(env, output, 0, pcm_data_length, (jbyte*) pcm_data);
 
     (*env)->CallVoidMethod(env, globals->handler, globals->cache->onAudioDataMethodId, call_id, output);
+
+    (*env)->DeleteLocalRef(output);
 
     UNUSED(tox_av);
 }
