@@ -1102,7 +1102,7 @@ static void callback_filedata(Tox *tox, int32_t friendnumber, uint8_t filenumber
 
     (*env)->CallVoidMethod(env, ptr->handler, ptr->cache->onFileDataMethodId, friendnumber, filenumber, _data);
 
-    (*env)->DeleteLocalRef(_data);
+    (*env)->DeleteLocalRef(env, _data);
 
 	UNUSED(tox);
 }
