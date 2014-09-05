@@ -715,7 +715,7 @@ JNIEXPORT jlong JNICALL Java_im_tox_jtoxcore_JTox_toxav_1new
 	toxav_register_callstate_callback(globals->toxav, avcallback_end, av_OnEnd, globals);
 	toxav_register_callstate_callback(globals->toxav, avcallback_ringing, av_OnRinging, globals);
 	toxav_register_callstate_callback(globals->toxav, avcallback_starting, av_OnStarting, globals);
-	toxav_register_callstate_callback(globals->toxav, avcallback_ending, av_OnInvite, globals);
+	toxav_register_callstate_callback(globals->toxav, avcallback_ending, av_OnEnding, globals);
 	toxav_register_callstate_callback(globals->toxav, avcallback_requesttimeout, av_OnRequestTimeout, globals);
 	toxav_register_callstate_callback(globals->toxav, avcallback_peertimeout, av_OnPeerTimeout, globals);
 	toxav_register_callstate_callback(globals->toxav, avcallback_mediachange, av_OnMediaChange, globals);
