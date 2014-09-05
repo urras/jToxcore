@@ -1523,15 +1523,14 @@ public class JTox<F extends ToxFriend> {
 	}
 
 	/**
-	 * Turns the given String into an array of UTF-8 encoded bytes, also adding
-	 * a nullbyte at the end for convenience
+	 * Turns the given String into an array of UTF-8 encoded bytes
 	 *
 	 * @param in
 	 *            the String to convert
 	 * @return a byte array
 	 */
 	public static byte[] getStringBytes(String in) {
-		return (in + '\000').getBytes(Charset.forName("UTF-8"));
+		return (in).getBytes(Charset.forName("UTF-8"));
 	}
 
 	/**

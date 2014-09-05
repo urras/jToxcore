@@ -1354,11 +1354,12 @@ static void avcallback_audio(ToxAv *tox_av, int32_t call_id, int16_t *pcm_data, 
 	ATTACH_THREAD(globals, env);
 	
 	//create java byte array from pcm data
-	jbyte _output[pcm_data_length];
 	output = (*env)->NewByteArray(env, pcm_data_length);
-	(*env)->SetByteArrayRegion(env, output, 0, pcm_data_length, _output);
+	(*env)->SetByteArrayRegion(env, output, 0, pcm_data_length, (jbyte*) pcm_data);
 
     (*env)->CallVoidMethod(env, globals->handler, globals->cache->onAudioDataMethodId, call_id, output);
+
+    UNUSED(tox_av);
 }
 static void avcallback_video(ToxAv *tox_av, int32_t call_id, vpx_image_t *img, void *user_data)
 {
@@ -1401,6 +1402,8 @@ static void avcallback_video(ToxAv *tox_av, int32_t call_id, vpx_image_t *img, v
 	(*env)->SetByteArrayRegion(env, output, 0, size, _output);
 
     (*env)->CallVoidMethod(env, globals->handler, globals->cache->onVideoDataMethodId, call_id, output, img->d_w, img->d_h);
+
+    UNUSED(tox_av);
 }
 
 Tox_Options tox_options_to_native(JNIEnv *env, jobject tox_options)
