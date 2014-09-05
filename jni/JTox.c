@@ -1354,8 +1354,8 @@ static void avcallback_audio(ToxAv *tox_av, int32_t call_id, int16_t *pcm_data, 
 	ATTACH_THREAD(globals, env);
 	
 	//create java byte array from pcm data
-	output = (*env)->NewByteArray(env, pcm_data_length);
-	(*env)->SetByteArrayRegion(env, output, 0, pcm_data_length, (jbyte*) pcm_data);
+	output = (*env)->NewByteArray(env, pcm_data_length*2);
+	(*env)->SetByteArrayRegion(env, output, 0, pcm_data_length*2, (jbyte*) pcm_data);
 
     (*env)->CallVoidMethod(env, globals->handler, globals->cache->onAudioDataMethodId, call_id, output);
     (*env)->DeleteLocalRef(env, output);
