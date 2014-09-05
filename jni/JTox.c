@@ -1358,6 +1358,7 @@ static void avcallback_audio(ToxAv *tox_av, int32_t call_id, int16_t *pcm_data, 
 	(*env)->SetByteArrayRegion(env, output, 0, pcm_data_length, (jbyte*) pcm_data);
 
     (*env)->CallVoidMethod(env, globals->handler, globals->cache->onAudioDataMethodId, call_id, output);
+    (*env)->DeleteLocalRef(env, output);
 
     UNUSED(tox_av);
 }

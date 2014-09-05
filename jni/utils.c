@@ -95,7 +95,7 @@ jobject codec_settings_to_java(JNIEnv *env, ToxAvCSettings codec_settings_native
 	jclass clazz;
 	jclass enum_class;
 	jfieldID enum_field_id;
-	jobject *call_type;
+	jobject call_type;
 	jmethodID init_method;
 
 	//Turn calltype c enum into java enum
@@ -113,7 +113,7 @@ jobject codec_settings_to_java(JNIEnv *env, ToxAvCSettings codec_settings_native
 	clazz = (*env)->FindClass(env, "im/tox/jtoxcore/ToxCodecSettings");
 	init_method = (*env)->GetMethodID(env, clazz, "<init>", "(Lim/tox/jtoxcore/ToxCallType;IIIIIII)V");
 	jobject codec_settings = (*env)->NewObject(env, clazz, init_method
-							 , *call_type
+							 , call_type
 							 , (jint) codec_settings_native.video_bitrate
 							 , (jint) codec_settings_native.max_video_width
 							 , (jint) codec_settings_native.max_video_height
