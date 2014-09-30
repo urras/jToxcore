@@ -1541,7 +1541,7 @@ public class JTox<F extends ToxFriend> {
 	 * @return an UTF-8 String based on the given byte array
 	 */
 	public static String getByteString(byte[] in) {
-	    return new String(in, Charset.fromName("UTF-8"));
+	    return new String(in, Charset.forName("UTF-8"));
 	}
 
 	/**
