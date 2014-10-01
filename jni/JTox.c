@@ -230,9 +230,9 @@ JNIEXPORT jboolean JNICALL Java_im_tox_jtoxcore_JTox_tox_1load(JNIEnv *env, jobj
 	int ret = tox_load(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, (uint8_t *) data, length);
 
 	if (ret == -1)
-	    return JNI_FALSE
+	    return JNI_FALSE;
 	else
-	    return JNI_TRUE
+	    return JNI_TRUE;
 }
 
 /**
