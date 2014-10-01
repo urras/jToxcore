@@ -227,8 +227,12 @@ JNIEXPORT jboolean JNICALL Java_im_tox_jtoxcore_JTox_tox_1load(JNIEnv *env, jobj
 	jbyte *data = (*env)->GetByteArrayElements(env, bytes, 0);
 
 	UNUSED(obj);
-	return tox_load(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, (uint8_t *) data, length) == 0 ?
-		   JNI_FALSE : JNI_TRUE;
+	int ret = tox_load(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, (uint8_t *) data, length);
+
+	if (ret == -1)
+	    return JNI_FALSE
+	else
+	    return JNI_TRUE
 }
 
 /**
