@@ -229,11 +229,15 @@ JNIEXPORT jboolean JNICALL Java_im_tox_jtoxcore_JTox_tox_1load(JNIEnv *env, jobj
 	UNUSED(obj);
 	int ret = tox_load(((tox_jni_globals_t *) ((intptr_t) messenger))->tox, (uint8_t *) data, length);
 
+    /* The tox_load return value should be ignored for now
     // 0 on success, 1 on success and encrypted data file found
 	if (ret == 0 || ret == 1)
 	    return JNI_FALSE;
 	else
 	    return JNI_TRUE;
+	*/
+
+	return JNI_FALSE;
 }
 
 /**
