@@ -1,6 +1,5 @@
 jToxcore
 ========
-#*Notice: This project has been deprecated in favor of [Tox4j](https://github.com/sonOfRa/tox4j), and will no longer be maintained.*
 
 JNI wrapper for Toxcore
 
